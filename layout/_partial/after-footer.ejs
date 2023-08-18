@@ -45,7 +45,7 @@
 <% if(theme.cdn.use == 'jsdelivr') { %>
 <script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.js" defer></script>
 <% } else if ( theme.cdn.use == 'self_host') { %>
-<%- js(url_for('js/lazyload.js')) %>
+<%- js(('js/lazyload.js')) %>
 <% } %>
 <!--PJAX-->
 <!--Pjax from https://github.com/MoOx/pjax-->

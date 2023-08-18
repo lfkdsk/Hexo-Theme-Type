@@ -210,7 +210,7 @@ vercel_analytics:
 
 # Howxm
 howxm_analytics:
-  use: true
+  use: false
   appid: 71bfe8d1-4930-430e-bc42-fa43202e93b4 
 
 # chart.js

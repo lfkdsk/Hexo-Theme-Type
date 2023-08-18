@@ -82,24 +82,24 @@
   <% } %>
   <%- partial('_partial/fonts') %>
   <!-- Custom CSS/Sass -->
-  <%- css(url_for('css/style')) %>
+  <%- css(('css/style')) %>
   <!--样式切换-->
   <% if (theme.schemes =='column' ){ %>
-  <%- css(url_for('css/mdui.min')) %>
+  <%- css(('css/mdui.min')) %>
   <%- css(url_for('css/column')) %>
   <%} else if (theme.schemes =='m3' ){ %>
-  <%- css(url_for('css/material3')) %>
+  <%- css(('css/material3')) %>
   <% } %>
   <% if (page.layout =='gallery' ){ %>
-  <%- css(url_for('css/gallery')) %>
+  <%- css(('css/gallery')) %>
   <% } %>
   <% if (page.layout =='gallery2' ){ %>
-  <%- css(url_for('css/gallery2')) %>
+  <%- css(('css/gallery2')) %>
   <% } %>
   <% if(theme.highlight.use == true) { %>
   <!--highlight.js CSS-->
   <% if(theme.highlight.style == 'github' ) { %>
-  <%- css(url_for('css/highlight/github')) %>
+  <%- css(('css/highlight/github')) %>
   <% } else if (theme.highlight.style == 'tomorrow') { %>
   <%- css(url_for('css/highlight/tomorrow')) %>
   <% } else if (theme.highlight.style == 'night-blue') { %>
