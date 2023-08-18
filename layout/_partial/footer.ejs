@@ -1,0 +1,35 @@
+<!-- Footer -->
+<footer class="itp-footer text-center">
+  <section class="footer-info">
+    <%- config.title %> &copy; <%- theme.start_time %> - <%= (new Date()).getFullYear() %>
+    <% if (theme.count == true){ %>
+    <span> / </span>
+    <%- symbolsCountTotal(site) %>
+    <% } %>
+    <% if (theme.icp){ %>
+    <span> / </span>
+    <a href="http://www.beian.miit.gov.cn"><%- theme.icp %></a>
+    <% } %>
+    <% if (theme.busuanzi == true){ %>
+    <span> / </span>
+    <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+    <% } %>
+    <span> / Theme</span>
+    <a href="https://github.com/aiokr/hexo-theme-type" target="_blank">Type
+    </a>
+  </section>
+  <% if (theme.footer_logo.use == 'upyun'){ %>
+  <section class="footer-logo">
+    <a href="https://www.upyun.com/?utm_source=lianmeng&utm_medium=referral" target="_blank">
+      <img style="max-height: 40px !important; display: block; margin: 0 auto;" src="<%- url_for(theme.footer_logo.upyun) %>" alt="upyun logo"></a>
+  </section>
+  <%} else if (theme.footer_logo.use == 'vercel'){ %>
+  <section class="footer-logo">
+    <a href="https://vercel.com/" target="_blank">
+      <img style="padding-top: 12px; width: 80px !important; opacity: 0.4; display: block; margin: 0 auto;" src="<%- url_for(theme.footer_logo.vercel) %>" alt="vercel logo"></a>
+  </section>
+  <%} else if (theme.footer_logo.use == 'self'){ %>
+    <a href="<%- theme.footer_logo.self.link %>" target="_blank">
+      <img width="80px" height="80px" style="padding-top: 12px; display: block; margin: 0 auto;" src="<%- url_for(theme.footer_logo.self.src) %>" alt="footer logo"></a>
+  <% } %>
+</footer>

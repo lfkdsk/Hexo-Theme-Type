@@ -1,0 +1,209 @@
+<section class="pjax-area">
+  <div class="content-area post-album">
+    <div class="grid grid-cols-3 gap-2">
+      <div class="pic-area">
+        <div class="pic-item"/>
+          <img id="imgbox" class="pic-box" src="<%- page.cover || theme.header.img %>" />
+        </div>
+        <div class="album-list flex gap-2">
+          <% for (var i in page.photos) { %>
+          <a class="album-item lazy" id="<%- i %>" rel="<%- page.photos[i] %>" href="javascript:void(0);" onClick="changeimg(event)" data-src="<%- page.photos[i] %>" aria-label="the photo <%- i %>"></a>
+          <% } %>
+        </div>
+        <div class="text-center text-xs pt-2 hint-text"><%- __('album_tips') %>
+        </div>
+      </div>
+      <div class="album-info">
+        <div class="album-info-main">
+          <div class="album-title"><%- page.title %></div>
+          <span class="album-subtitle">
+            <%= page.date.format(config.date_format) %><br />
+          </span>
+          <span class="album-subtitle">
+            <%= page.excerpt %>
+          </span>
+        </div>
+        <div class="album-article article">
+          <%- page.content %>
+        </div>
+        <div class="album-info-btm">
+          <% if ( page.location ){ %>
+          <div class="album-location">
+            <iconpark-icon name="aiming"></iconpark-icon><span><%- page.location %></span>
+          </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+    <% if ( theme.comment.use ) { %>
+    <div id="comment" class="itp-m3-card album-comment">
+      <%- partial('_partial/comment') %>
+    </div>
+    <% } %>
+  </div>
+  <script>
+    var imageBox = document.getElementById("imgbox"); // imageBox 是放置大图片的图框
+    imgno = 0; // 进入页面时，设定初始的图片编号为0 // 定义新变量时不使用 var 则为全局变量、
+    function changeimg() { //changeimg 函数用于获取图片链接和替换大图图片，在鼠标点击图片列表时调用
+      var imgLink = event.target.getAttribute('rel'); //获取被点击的图片链接
+      imgno = event.target.getAttribute('id'); //获取图片编号
+      var imageFancy = imageBox.parentElement; // imageBox 是放置大图片的图框
+      imageBox.src = imgLink; //替换图片
+      imageFancy.setAttribute('href', imgLink);
+    };
+    window.onkeydown = function album_hotkey() {
+      //[键盘快捷键] 左箭头 上一张
+      if (event.keyCode === 37) {
+        imgno = imgno - 1; // 设置图片编号-1
+        if (imgno < 0) {
+          imgno = 0;
+        }
+        var imgLink = document.getElementById(imgno).getAttribute('rel')
+        imageBox.src = imgLink; //替换图片
+        var imageFancy = imageBox.parentElement; // imageBox 是放置大图片的图框
+        imageFancy.setAttribute("href", imgLink);
+      };
+      //[键盘快捷键] 右箭头 下一张
+      if (event.keyCode === 39) {
+        imgcount = document.getElementsByClassName('album-item').length - 1 //获取图片数量
+        imgno = imgno + 1;
+        if (imgno > imgcount) {
+          imgno = imgcount
+        }
+        var imgLink = document.getElementById(imgno).getAttribute('rel');
+        imageBox.src = imgLink; //替换图片
+        var imageFancy = imageBox.parentElement; // imageBox 是放置大图片的图框
+        imageFancy.setAttribute('href', imgLink);
+      };
+      //[键盘快捷键] 上箭头 恢复到第一张
+      if (event.keyCode === 38) {
+        imgno = 0;
+        console.log(imgno)
+        var imgLink = document.getElementById(imgno).getAttribute('rel')
+        imageBox.src = imgLink; //替换图片
+        var imageFancy = imageBox.parentElement; // imageBox 是放置大图片的图框
+        imageFancy.setAttribute('href', imgLink);
+      };
+    }
+  </script>
+  <style>
+    body {
+      background-color: #fff;
+    }
+
+    .album-comment {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+      .content-area {
+        max-width: 100vw;
+      }
+
+      .pic-area {
+        grid-column: span 3 / span 3;
+        padding: 16px;
+      }
+
+      .album-info {
+        grid-column: span 3 / span 3;
+        padding: 12px;
+      }
+
+      .album-article {
+        padding: 12px;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .content-area {
+        max-width: 92%;
+        margin: 0 auto;
+        padding: 135px 16px 16px 16px;
+      }
+
+      .pic-area {
+        grid-column: span 2 / span 2;
+      }
+
+      .album-info {
+        grid-column: span 1 / span 1;
+      }
+    }
+
+    @media (min-width: 1304px) {
+      .content-area {
+        max-width: 1200px;
+      }
+    }
+    .hint-text {
+      color: white;
+      opacity: 80%;
+    }
+
+    .pic-item {
+      background-color: black;
+      background-size: cover;
+      background-position: center;
+      transition: all .3s ease-in-out;
+      min-height: 200px;
+      aspect-ratio: 3 / 2;
+    }
+
+    .pic-box {
+      transition: all .3s ease-in-out;
+      max-height: 100%;
+      max-width: 100%;
+      height: 100%;
+      margin: 0 auto;
+    }
+
+    .album-info {
+      flex-direction: column;
+      justify-content: space-between;
+      color: var(--main-black);
+    }
+
+    .album-title {
+      font-size: 1.6em;
+    }
+
+    .album-subtitle {
+      font-size: .8em;
+      opacity: 0.8;
+    }
+
+
+    .album-location {
+      display: inline-flex;
+      font-size: .8em;
+      color: #71afdd;
+      gap: 4px;
+      padding-bottom: 4px;
+    }
+
+    .album-list {
+      padding-top: 12px;
+      overflow-x: scroll;
+    }
+
+    .album-item {
+      aspect-ratio: 1 / 1;
+      min-height: 100px;
+      min-width: 100px;
+      background-size: cover;
+      background-position: center;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .album-info {
+        color: #fff;
+      }
+
+      .album-location {
+        color: #bdbdbd;
+      }
+    }
+  </style>
+</section>

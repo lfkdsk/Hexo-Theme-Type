@@ -1,0 +1,5 @@
+<% if( theme.search.use == 'local' ) { %>
+<%- partial('_partial/search-local') %>
+<% } else if ( theme.search.use == 'algolia') { %>
+<%- partial('_partial/search-algolia') %>
+<% } %>

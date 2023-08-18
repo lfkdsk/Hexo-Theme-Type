@@ -1,0 +1,120 @@
+<% var toc = toc(page.content, {
+  class: 'itp-layer-toc',
+  id: '',
+  list_number: false,
+  max_depth: 2,
+  min_depth: 1,
+}) %>
+<% if (theme.schemes=='column' ){ %>
+<%- partial('_partial/drawer') %>
+<header id="header" class="itp-header noprn">
+  <div id="appbar-index" class="mdui-appbar mdui-appbar-fixed itp-appbar_index mdui-shadow-0">
+    <div id="toolbar-index" class="mdui-toolbar mdui-shadow-0" style="justify-content: center;">
+      <% if (theme.schemes=='column' ){ %>
+      <a class="mdui-btn mdui-btn-icon itp-drawer-btn itp-header-actions_menu" style="color: #fff" data-fancybox data-src="#nav_menu" href="javascript:;"><span class="material-icons-outlined">
+          menu
+        </span></a>
+      <% } %>
+      <a href="<%= url_for() %>" class="itp-header-title mdui-typo-title">
+        <%- config.title %>
+      </a>
+      <div class="itp-nav-action">
+        <% for (var i in theme.nav) { %>
+        <a href="<%- theme.nav[i].link %>" class="mdui-btn itp-header-actions" style="color: #fff">
+          <%- i %>
+        </a>
+        <% } %>
+      </div>
+      <div class="itp-nav-action">
+        <% if (theme.search_btn==true){ %>
+        <a href="/search.html" class="mdui-btn mdui-btn-icon itp-header-search-btn"><span class="material-icons-outlined">
+            search
+          </span></a>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</header>
+<% } %>
+<% if (theme.schemes=='m3' ){ %>
+<div class="itp-float-bar">
+  <!--所有页面都显示-->
+  <a class="itp-float-bar-item rounded" href="<%= url_for() %>" title="<%- config.title %>">
+    <% if (theme.nav_style=='icon' ){ %>
+    <iconpark-icon class="navicon" name="home"></iconpark-icon>
+    <%} else if (theme.nav_style =='text' ){ %>
+    <span><%- config.title %></span>
+    <% } %>
+  </a>
+  <% if (page.layout !=='post' ){ %>
+  <!--只在 **非文章** 页面显示-->
+  <% for (var i in theme.nav) { %>
+  <a class="itp-float-bar-item rounded" href="<%- theme.nav[i].link %>" title="<%- [i] %>">
+    <% if (theme.nav_style=='icon' ){ %>
+    <iconpark-icon class="navicon" name="<%- theme.nav[i].icon %>"></iconpark-icon>
+    <%} else if (theme.nav_style =='text' ){ %>
+    <span><%- [i] %></span>
+    <% } %>
+  </a>
+  <% } %>
+  <% if (theme.search_btn == true){ %>
+  <a href="/search/" class="itp-float-bar-item rounded">
+    <% if (theme.nav_style=='icon' ){ %>
+    <iconpark-icon class="navicon" name="search"></iconpark-icon>
+    <%} else if (theme.nav_style =='text' ){ %>
+    <span><%- __('search')%></span>
+    <% } %>
+  </a>
+  <% } %>
+  <%} else if (page.layout =='post' ){ %>
+  <!--只在 **文章** 页面显示-->
+  <a class="itp-float-bar-item rounded" onclick="scrollto(comment)" title="comment">
+    <% if (theme.nav_style=='icon' ){ %>
+    <iconpark-icon class="navicon" name="comment"></iconpark-icon>
+    <%} else if (theme.nav_style =='text' ){ %>
+    <span><%- __('post_comment')%></span>
+    <% } %>
+  </a>
+  <a class="itp-float-bar-item rounded" id="open_toc" onclick="OpenToc()" title="Table of contents">
+    <% if (theme.nav_style=='icon' ){ %>
+    <iconpark-icon class="navicon" name="list"></iconpark-icon>
+    <%} else if (theme.nav_style =='text' ){ %>
+    <span><%- __('post_toc')%></span>
+    <% } %>
+  </a>
+  <a class="itp-float-bar-item rounded" href="javascript:scroll(0,0)" title="to top">
+    <% if (theme.nav_style=='icon' ){ %>
+    <iconpark-icon class="navicon" name="top"></iconpark-icon>
+    <%} else if (theme.nav_style =='text' ){ %>
+    <span><%- __('post_totop')%></span>
+    <% } %>
+  </a>
+  <% } %>
+
+  <div class="itp-float-layer itp-toc-layer">
+    <div class="clost-btn" style="display: flex;">
+      <a class="itp-float-layer-close-btn" id="close_btn">
+        <div class="close_btn_red">
+        </div>
+      </a>
+    </div>
+    <%-(toc) %>
+  </div>
+  <div class="itp-float-layer-bg layer-bg-nodisplay" id="close_layer"></div>
+</div>
+<% } %>
+<% if (theme.nav_style =='text' ){ %>
+<style>
+  a.itp-float-bar-item {
+    line-height: 54px;
+    padding: 0 6px;
+  }
+</style>
+<% } %>
+<style>
+  .navicon {
+    font-size: 18px;
+    padding-top: 18px;
+    color: var(--main-black);
+  }
+</style>

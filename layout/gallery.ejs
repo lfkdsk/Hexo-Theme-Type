@@ -1,0 +1,26 @@
+<div class="content-area pjax-area itp-gallery-content" style="max-width: calc(100vw)">
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+    <% if (site.data.gallery) { %>
+    <% for (var a in site.data.gallery) { %>
+    <% for (var p in site.data.gallery[a].img ) { %>
+    <div style="padding: 2px; position: relative;">
+      <div class="itp-gallery2-tile itp-gallery-img lazy" data-src="<%- site.data.gallery[a].img[p] %>">
+        <a href="<%- site.data.gallery[a].img[p] %>" data-fancybox="images" class="image-fancy-link" data-caption="<%= a %>">
+        </a>
+      </div>
+    </div>
+    <% } %>
+    <% } %>
+    <% } %>
+  </div>
+  <style>
+    body {
+      background-color: #2f2f2f !important;
+    }
+  </style>
+  <script>
+    $(function() {
+      $("div.lazy").lazyload();
+    });
+  </script>
+</div>

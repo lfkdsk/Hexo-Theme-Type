@@ -1,0 +1,92 @@
+<!-- fancybox -->
+<% if(theme.cdn.use == 'jsdelivr') { %>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" />
+<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@4.0/dist/fancybox.umd.js"></script>
+<% } else if ( theme.cdn.use == 'self_host') { %>
+<script src="/js/fancybox.umd.js" defer></script>
+<link rel="stylesheet" href="/css/fancybox.css" />
+<% } %>
+<!-- mdui -->
+<% if (theme.schemes =='column' ){ %>
+<%- js('js/mdui.min.js') %>
+<% } %>
+<!-- busuanzi -->
+<% if (theme.busuanzi == true){ %>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" defer></script>
+<% } %>
+<!-- highlightjs -->
+<% if(theme.highlight.use == true) { %>
+<% if(theme.cdn.use == 'jsdelivr') { %>
+<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/highlight.min.js" defer></script>
+<% } else if ( theme.cdn.use == 'self_host') { %>
+<script src="/js/highlight.min.js" async></script>
+<% } %>
+<script>window.addEventListener('load', () => hljs.initHighlighting());</script>
+<script>
+  $("pre.code").each(function() {
+    $(this).html("<ol><li>" + $(this).html().replace(/\n/g, "\n</li><li>") + "\n</li></ol>");
+  });
+</script>
+<% } %>
+<% if(page.style == 'photos') { %>
+<%- js('js/gallery-page.js') %>
+<% } %>
+<%- js('js/app.js') %>
+<% if (theme.schemes =='column' ){ %>
+<%- js('js/nav-scroll.js') %>
+<%} else if (theme.schemes =='m3' ){ %>
+<% } %>
+<!--
+<%- js('js/canvas2image.js') %>
+<%- js('js/shareimg') %>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.js" defer></script>
+-->
+<!--lazyload-->
+<% if(theme.cdn.use == 'jsdelivr') { %>
+<script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.js" defer></script>
+<% } else if ( theme.cdn.use == 'self_host') { %>
+<%- js('js/lazyload.js') %>
+<% } %>
+<!--PJAX-->
+<!--Pjax from https://github.com/MoOx/pjax-->
+<% //if(theme.cdn.use == 'jsdelivr') { %>
+<!--<script src="https://cdn.jsdelivr.net/npm/pjax/pjax.js"></script>-->
+<!--<% //} else if ( theme.cdn.use == 'self_host') { %>-->
+<!--<%- //js('js/pjax.js') %>-->
+<!--<% //} %>-->
+<!--<%- //js('js/pjax-ctrl.js') %>-->
+<!--首页键盘快捷键-->
+<% if( (is_home()) ) { %>
+<script>
+  window.onkeydown = function allpage_hotkey() {
+    //[键盘快捷键] Shift+1 首页
+    if (event.shiftKey && event.keyCode === 49) {
+      window.location.href = "<%- config.root %>"
+    };
+    //[键盘快捷键] Shift+2 归档页
+    if (event.shiftKey && event.keyCode === 50) {
+      window.location.href = "/archives/"
+    };
+    //[键盘快捷键] Shift+3 相册页
+    if (event.shiftKey && event.keyCode === 51) {
+      window.location.href = "/gallery/"
+    };
+    //[键盘快捷键] Shift+4 关于页
+    if (event.shiftKey && event.keyCode === 52) {
+      window.location.href = "/about/"
+    };
+    //[键盘快捷键] Shift+5 友情链接页
+    if (event.shiftKey && event.keyCode === 53) {
+      window.location.href = "/links/"
+    };
+    //[键盘快捷键] 左箭头 上一页
+    if (event.keyCode === 37) {
+      window.location.href = "<%- config.root %><%- page.prev_link %>"
+    };
+    //[键盘快捷键] 右箭头 下一页
+    if (event.keyCode === 39) {
+      window.location.href = "<%- config.root %><%- page.next_link %>"
+    };
+  }
+</script>
+<% } %>

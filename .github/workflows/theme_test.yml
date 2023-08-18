@@ -1,0 +1,52 @@
+name: Hexo-Theme-Type auto test
+
+on: workflow_dispatch
+  
+jobs:
+  node-package:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+      with:
+        submodules: true
+  theme_test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+      with:
+        submodules: true
+    - name: hexo test
+      run: |
+        npm install hexo-cli -g
+        mkdir hexo-test
+        cd hexo-test
+        hexo init
+        npm install hexo-deployer-git --save
+        npm install hexo-theme-type --save
+        npm install hexo-generator-archive
+        npm install hexo-generator-category
+        npm install hexo-generator-tag
+        npm install hexo-renderer-markdown-it
+        npm install hexo-symbols-count-time
+        npm install
+        sudo cp -v ./node_modules/hexo-theme-type/_config_test.yml ./_config.type.yml
+        sudo cp -v ./node_modules/hexo-theme-type/assets/_config.yml ./_config.yml
+        cd source/_posts
+        git init
+        git remote add origin  https://github.com/hexojs/hexo-theme-unit-test
+        git config core.sparsecheckout true
+        echo "/source/_posts" >> .git/info/sparse-checkout
+        git pull --depth 1 origin master
+        cd ../..
+        hexo g
+        cd public
+        tree
+        git init
+        git config --global push.default matching
+        git config --global user.email "hiaiokr@gmail.com"
+        git config --global user.name "aiokr"
+        git add --all .
+        git commit -m "Auto Builder of Type Live Preivew"
+        git push --force "https://${{secrets.THEME_LIVE_PREIVEW}}@github.com/photup/type-live-preivew.git" master

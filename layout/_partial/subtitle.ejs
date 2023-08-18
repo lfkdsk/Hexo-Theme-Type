@@ -1,0 +1,38 @@
+<% if( (is_home()) ) { %>
+<%- config.description %>
+<% } else if( (is_post()) ) { %>
+<%= page.date.format(config.date_format) %>
+<span> / </span>
+<% if (page.categories && page.categories.length) { %>
+<%- list_categories(page.categories, {
+        show_count: false,
+        separator: '<span class="itp-post-cat"></span><span> / </span>',
+        style: ''
+      }) %>
+<% } %>
+<% if(page.author) { %>
+<span> / </span>
+<%= config.author || page.author %>
+<% } %>
+<span> / </span>
+<%- symbolsCount(page) %>
+<style>
+  .category-link {
+    color: var(--main-black);
+  }
+
+  @media print {
+    .itp-cover-subtitle a {
+      color: var(--main-black) !important;
+    }
+  }
+
+  @media screen {
+    .itp-cover-subtitle a {
+      color: <%- page.title_color || theme.header.title_color || '#fff'%> !important;
+    }
+  }
+</style>
+<% } else { %>
+<%- config.description %>
+<% } %>
