@@ -3,7 +3,7 @@
     <div class="grid grid-cols-3 gap-2">
       <div class="pic-area">
         <div class="pic-item"/>
-          <img id="imgbox" class="pic-box" src="<%- page.cover || theme.header.img %>" />
+          <img id="imgbox" class="pic-box" src="<%- page.photos[0] %>" />
         </div>
         <div class="album-list flex gap-2">
           <% for (var i in page.photos) { %>
