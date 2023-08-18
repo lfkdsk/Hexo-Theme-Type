@@ -82,39 +82,39 @@
   <% } %>
   <%- partial('_partial/fonts') %>
   <!-- Custom CSS/Sass -->
-  <%- css('css/style') %>
+  <%- css(url_for('css/style')) %>
   <!--样式切换-->
   <% if (theme.schemes =='column' ){ %>
-  <%- css('css/mdui.min') %>
-  <%- css('css/column') %>
+  <%- css(url_for('css/mdui.min')) %>
+  <%- css(url_for('css/column')) %>
   <%} else if (theme.schemes =='m3' ){ %>
-  <%- css('css/material3') %>
+  <%- css(url_for('css/material3')) %>
   <% } %>
   <% if (page.layout =='gallery' ){ %>
-  <%- css('css/gallery') %>
+  <%- css(url_for('css/gallery')) %>
   <% } %>
   <% if (page.layout =='gallery2' ){ %>
-  <%- css('css/gallery2') %>
+  <%- css(url_for('css/gallery2')) %>
   <% } %>
   <% if(theme.highlight.use == true) { %>
   <!--highlight.js CSS-->
   <% if(theme.highlight.style == 'github' ) { %>
-  <%- css('css/highlight/github') %>
+  <%- css(url_for('css/highlight/github')) %>
   <% } else if (theme.highlight.style == 'tomorrow') { %>
-  <%- css('css/highlight/tomorrow') %>
+  <%- css(url_for('css/highlight/tomorrow')) %>
   <% } else if (theme.highlight.style == 'night-blue') { %>
-  <%- css('css/highlight/tomorrow-night-blue') %>
+  <%- css(url_for('css/highlight/tomorrow-night-blue')) %>
   <% } else if (theme.highlight.style == 'night-bright') { %>
-  <%- css('css/highlight/tomorrow-night-bright') %>
+  <%- css(url_for('css/highlight/tomorrow-night-bright')) %>
   <% } else if (theme.highlight.style == 'night-eighties') { %>
-  <%- css('css/highlight/tomorrow-night-eighties') %>
+  <%- css(url_for('css/highlight/tomorrow-night-eighties')) %>
   <% } %>
   <% } %>
   <!-- jquery -->
   <% if(theme.cdn.use == 'jsdelivr') { %>
   <script src="//cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
   <% } else if ( theme.cdn.use == 'self_host') { %>
-  <script src="/js/jquery.min.js"></script>
+  <script src="<%- url_for('/js/jquery.min.js') %>"></script>
   <% } %>
   <!--Comment-->
   <% if(theme.comment.use == 'none') { %>
@@ -123,11 +123,11 @@
   <% } else if (theme.comment.use == 'waline') { %>
   <!--Waline-->
   <script src="/js/waline.js" defer></script>
-  <link rel="stylesheet" href="/css/waline.css" />
+  <link rel="stylesheet" href="<%- url_for('/css/waline.css') %>" />
   <% } %>
   <!--Vercel Audiences Analytics-->
   <% if(theme.vercel_analytics.use == true) { %>
-  <script defer src="/va/script.js"></script>
+  <script defer src="<%- url_for('/va/script.js') %>"></script>
   <% } %>
   <!--umami analytics-->
   <% if(theme.umami_analytics.use == true) { %>
@@ -189,7 +189,7 @@
   <% if(theme.cdn.use == 'jsdelivr') { %>
   <script src="https://cdn.jsdelivr.net/npm/cfga@1.0.1" async></script>
   <% } else if ( theme.cdn.use == 'self_host') { %>
-  <script src="/js/cfga@1.0.1" async></script>
+  <script src="<%- url_for('/js/cfga@1.0.1') %>" async></script>
   <% } %>
   <% } else if (theme.google_analytics.use == 'gtag') { %>
   <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -210,12 +210,12 @@
   <% if(theme.cdn.use == 'jsdelivr') { %>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
   <% } else if ( theme.cdn.use == 'self_host') { %>
-  <script src="/js/chart.js@2.8.0"></script>
+  <script src="<%- url_for('/js/chart.js@2.8.0') %>"></script>
   <% } %>
   <% } %>
   <% } %>
   <% if (theme.pwa.use == true){ %>
-  <link rel="manifest" href="/manifest.json">
+  <link rel="manifest" href="<%- url_for('/manifest.json') %>">
   <meta name="theme-color" content="<%= theme.pwa.theme_color %>">
   <% } %>
   <!-- Google Search Advanced
