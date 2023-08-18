@@ -117,7 +117,7 @@ social_link:
 # Footer Settings 页脚设置
 # ---------------------------------------------------------------
 
-start_time: 2016
+start_time: 2017
 # 如果设置 count 选项，需要运行 npm install hexo-symbols-count-time --save
 # 'count' need run 'npm install hexo-symbols-count-time --save'
 count: true
