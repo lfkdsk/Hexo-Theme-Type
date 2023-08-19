@@ -10,14 +10,13 @@
           <a class="album-item lazy" id="<%- i %>" rel="<%- page.photos[i] %>" href="javascript:void(0);" onClick="changeimg(event)" data-src="<%- page.photos[i] %>" aria-label="the photo <%- i %>"></a>
           <% } %>
         </div>
-        <!-- <div class="text-center text-xs pt-2 hint-text"><%- __('album_tips') %> -->
-        </div>
+        <div class="text-center text-xs pt-2 hint-text"> </div>
       </div>
       <div class="album-info">
         <div class="album-info-main">
           <div class="album-title"><%- page.title %></div>
           <span class="album-subtitle">
-            <%= page.date.format(config.date_format) %><br />
+            &nbsp;<%= page.date.format(config.date_format) %><br />
           </span>
           <span class="album-subtitle">
             <%= page.excerpt %>
