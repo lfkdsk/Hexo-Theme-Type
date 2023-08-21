@@ -28,8 +28,8 @@
     <a href="https://vercel.com/" target="_blank">
       <img style="padding-top: 12px; width: 80px !important; opacity: 0.4; display: block; margin: 0 auto;" src="<%- url_for(theme.footer_logo.vercel) %>" alt="vercel logo"></a>
   </section>
-  <%} else if (theme.footer_logo.use == 'self'){ %>
-    <a href="<%- theme.footer_logo.self.link %>" target="_blank">
+  <%} else if (config.footer_logo.use == 'self'){ %>
+    <a href="<%- config.footer_logo.self.link %>" target="_blank">
       <img width="80px" height="80px" style="padding-top: 12px; display: block; margin: 0 auto;" src="<%- url_for(theme.footer_logo.self.src) %>" alt="footer logo"></a>
   <% } %>
 </footer>

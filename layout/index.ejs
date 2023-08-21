@@ -2,7 +2,11 @@
   <div class="content-area album-area">
     <% if (theme.photography_page.slogan == true) { %>
     <div class="container gpro-slogan title">
-      <%- theme.photography_page.slogan_descr %>
+      <% if (config.photography_page.slogan == true) { %>
+        <%- config.photography_page.slogan_descr %>
+      <% } else { %>
+        <%- theme.photography_page.slogan_descr %>
+      <% } %>
     </div>
     <% } %>
     <div class="container gpro-container grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
