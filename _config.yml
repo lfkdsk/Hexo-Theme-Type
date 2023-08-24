@@ -193,10 +193,10 @@ busuanzi: false
 # 如果 use 项选择 gtag，将使用 Google 全局网站代码 (gtag.js) 接入谷歌分析
 # Use: default | cf_async | gtag
 google_analytics: 
-  use: gtag
+  use: false
   ga_id: 
   ga_api: 
-  gtag_id: G-HFH67WJVKQ
+  gtag_id: G-8TMSDJG47Q
 
 # umami Analytics
 umami_analytics: 
