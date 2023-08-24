@@ -158,7 +158,10 @@
   </script>
   <!-- End of Howxm client code snippet -->
   <% } %>
-  <% if(theme.google_analytics.use == 'default') { %>
+  <% console.log(typeof(config.google_analytics) !== 'undefined') %>
+  <% console.log(config.google_analytics.use) %>
+  <% if (typeof(config.google_analytics) !== 'undefined') {%>
+  <% if(config.google_analytics.use == 'default') { %>
   <!-- Google Analytics -->
   <script async>
     (function(i, s, o, g, r, a, m) {
@@ -173,7 +176,7 @@
       m.parentNode.insertBefore(a, m)
     })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
 
-    ga('create', '<%= theme.google_analytics.ga_id %>', 'auto', {
+    ga('create', '<%= config.google_analytics.ga_id %>', 'auto', {
       'siteSpeedSampleRate': 100
     }, {
       'alwaysSendReferrer': true
@@ -181,20 +184,20 @@
     ga('send', 'pageview');
     ga('set', 'forceSSL', true);
   </script>
-  <% } else if (theme.google_analytics.use == 'cf_async') { %>
+  <% } else if (config.google_analytics.use == 'cf_async') { %>
   <!-- Google Analytics with Cloudflare Async -->
   <script>
-    window.ga_tid = "<%= theme.google_analytics.ga_id %>"; // {String} The trackerID of your site.
-    window.ga_api = "<%= theme.google_analytics.ga_api %>"; // {String} The route of your cloudflare workers you just registered before.
+    window.ga_tid = "<%= config.google_analytics.ga_id %>"; // {String} The trackerID of your site.
+    window.ga_api = "<%= config.google_analytics.ga_api %>"; // {String} The route of your cloudflare workers you just registered before.
   </script>
   <% if(theme.cdn.use == 'jsdelivr') { %>
   <script src="https://cdn.jsdelivr.net/npm/cfga@1.0.1" async></script>
   <% } else if ( theme.cdn.use == 'self_host') { %>
   <script src="<%- url_for('/js/cfga@1.0.1') %>" async></script>
   <% } %>
-  <% } else if (theme.google_analytics.use == 'gtag') { %>
+  <% } else if (config.google_analytics.use == 'gtag') { %>
   <!-- Global site tag (gtag.js) - Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=<%= theme.google_analytics.gtag_id %>" defer></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=<%= config.google_analytics.gtag_id %>" defer></script>
   <script>
     window.dataLayer = window.dataLayer || [];
 
@@ -203,8 +206,9 @@
     }
     gtag('js', new Date());
 
-    gtag('config', '<%= theme.google_analytics.gtag_id %>');
+    gtag('config', '<%= config.google_analytics.gtag_id %>');
   </script>
+  <% } %>
   <% } %>
   <% if(page.layout == 'post') { %>
   <% if (theme.chart_js.use == true){ %>
