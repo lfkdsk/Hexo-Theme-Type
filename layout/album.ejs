@@ -1,7 +1,7 @@
 <section class="pjax-area">
-  <div class="content-area post-album">
+  <div class="content-area post-album <%- page.style %>-content-area">
     <div class="grid grid-cols-3 gap-2">
-      <div class="pic-area">
+      <div class="pic-area <%- page.style %>-pic">
         <div class="pic-item" />
         <img id="imgbox" class="pic-box" src="<%- page.photos[0].url %>" />
       </div>
@@ -21,7 +21,7 @@
       </div>
       <div class="text-center text-xs pt-2 hint-text"> </div>
     </div>
-    <div class="album-info">
+    <div class="album-info <%- page.style %>-info">
       <div class="album-info-main">
         <div class="album-title"><%- page.title %></div>
         <span class="album-subtitle">
@@ -261,6 +261,10 @@
           .content-area {
             max-width: 1400px;
           }
+
+          .fullscreen-content-area {
+            max-width: 100vh;
+          }
         }
 
         @media (prefers-color-scheme: dark) {
@@ -276,6 +280,14 @@
             color: white;
             opacity: 80%;
           }
+        }
+
+        .fullscreen-pic {
+          grid-column: span 3 / span 3;
+        }
+
+        .fullscreen-info {
+          grid-column: span 3 / span 3;
         }
       </style>
 </section>
