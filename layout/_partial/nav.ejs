@@ -19,8 +19,8 @@
         <%- config.title %>
       </a>
       <div class="itp-nav-action">
-        <% for (var i in theme.nav) { %>
-        <a href="<%- theme.nav[i].link %>" class="mdui-btn itp-header-actions" style="color: #fff">
+        <% for (var i in config.nav) { %>
+        <a href="<%- config.nav[i].link %>" class="mdui-btn itp-header-actions" style="color: #fff">
           <%- i %>
         </a>
         <% } %>
@@ -48,10 +48,10 @@
   </a>
   <% if (page.layout !=='post' ){ %>
   <!--只在 **非文章** 页面显示-->
-  <% for (var i in theme.nav) { %>
-  <a class="itp-float-bar-item rounded" href="<%- theme.nav[i].link %>" title="<%- [i] %>">
+  <% for (var i in config.nav) { %>
+  <a class="itp-float-bar-item rounded" href="<%- config.nav[i].link %>" title="<%- [i] %>">
     <% if (theme.nav_style=='icon' ){ %>
-    <iconpark-icon class="navicon" name="<%- theme.nav[i].icon %>"></iconpark-icon>
+    <iconpark-icon class="navicon" name="<%- config.nav[i].icon %>"></iconpark-icon>
     <%} else if (theme.nav_style =='text' ){ %>
     <span><%- [i] %></span>
     <% } %>
