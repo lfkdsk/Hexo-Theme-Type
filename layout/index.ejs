@@ -13,7 +13,9 @@
       <% if (site.data.album) { %>
       <% for (var a in site.data.album) { %>
       <a href="<%- url_for(site.data.album[a].url) %>">
-        <div class="gpro-tile lazy" data-src="<%- site.data.album[a].cover %>">
+        <% var file = site.data.album[a].cover %>
+        <% var cover = config.thumbtail_url + file.substr(0, file.lastIndexOf(".")) + ".webp" %>
+        <div class="gpro-tile lazy" data-src="<%- cover %>">
           <div class="gpro-tile-descr flex-col">
             <div class="text-xl font-medium uppercase"><%= a %></div>
             <% var isEmpty = site.data.album[a].date === '' %>
