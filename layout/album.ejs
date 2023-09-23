@@ -14,6 +14,8 @@
           <% var thum = p.thum; %>
           <% var desc = p.desc; %>
           <!-- <% console.log("thum: " + thum + " url: " + url) %> -->
+          <link rel="preload" href="<%- url %>" as="image" />
+          <link rel="preload" href="<%- thum %>" as="image" />
           <a class="album-item lazy" id="<%- i %>"
             name="<%- name %>" rel="<%- url %>"
             desc=" <%- desc %> "
