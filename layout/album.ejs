@@ -14,8 +14,6 @@
           <% var thum = p.thum; %>
           <% var desc = p.desc; %>
           <!-- <% console.log("thum: " + thum + " url: " + url) %> -->
-          <link rel="preload" href="<%- url %>" as="image" />
-          <link rel="preload" href="<%- thum %>" as="image" />
           <a class="album-item lazy" id="<%- i %>"
             name="<%- name %>" rel="<%- url %>"
             desc=" <%- desc %> "
@@ -25,6 +23,12 @@
       </div>
       <div class="text-center text-xs pt-2 hint-text"> </div>
     </div>
+    <% for (var i in page.photos) { %>
+      <% var url = p.url; %>
+      <% var thum = p.thum; %>
+      <link rel="preload" href="<%- thum %>" as="image" />
+      <link rel="preload" href="<%- url %>" as="image" />  
+    <% } %>
     <div class="album-info <%- page.style %>-info">
       <div class="album-info-main">
         <div class="album-title"><%- page.title %></div>
