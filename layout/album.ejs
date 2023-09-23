@@ -11,11 +11,13 @@
           <% var p = page.photos[i]; %>
           <% var url = p.url; %>
           <% var name = p.name; %>
+          <% var thum = p.thum; %>
           <% var desc = p.desc; %>
+          <% console.log("thum: " + thum + " url: " + url) %>
           <a class="album-item lazy" id="<%- i %>"
             name="<%- name %>" rel="<%- url %>"
             desc=" <%- desc %> "
-            href="javascript:void(0);" onClick="changeimg(event)" data-src="<%- url %>"
+            href="javascript:void(0);" onClick="changeimg(event)" data-src="<%- thum %>"
             aria-label="the photo <%- i %>"></a>
           <% } %>
       </div>
