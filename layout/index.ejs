@@ -14,7 +14,7 @@
       <% for (var a in site.data.album) { %>
       <a href="<%- url_for(site.data.album[a].url) %>">
         <% var file = site.data.album[a].cover %>
-        <% var cover = config.thumbtail_url + file.substr(0, file.lastIndexOf(".")) + ".webp" %>
+        <% var cover = config.thumbnail_url + file.substr(0, file.lastIndexOf(".")) + ".webp" %>
         <div class="gpro-tile lazy" data-src="<%- cover %>">
           <div class="gpro-tile-descr flex-col">
             <div class="text-xl font-medium uppercase"><%= a %></div>
