@@ -27,7 +27,13 @@
       <div class="album-info-main">
         <div class="album-title"><%- page.title %></div>
         <span class="album-subtitle">
-          —— <%= page.date.format(config.date_format) %><br />
+          <% var useSub = page.subtitle !== '' && page.subtitle !== null %>
+          <% console.log(page.subtitle) %>
+          <% if (useSub) { %>
+            —— <%= page.subtitle %><br />
+            <% } else { %>
+            —— <%= page.date.format(config.date_format) %><br />
+          <% } %>
         </span>
         <span class="album-subtitle">
           <%= page.excerpt %>
