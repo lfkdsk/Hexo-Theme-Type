@@ -26,7 +26,7 @@
   
       #map { 
         min-height: 600px;
-        max-height: 800px; 
+        max-height: 1200px; 
         max-width: 1400px;
         margin: 0 auto;
       }
@@ -112,6 +112,9 @@
         }
       }
     
+      .leaflet-popup-content {
+        min-width: 300px;
+      }
     </style>
     <script type="text/javascript">
         var album_data = JSON.parse(`<%- JSON.stringify(site.data.album) %>`);
@@ -135,7 +138,7 @@
             }
             // add marker
             var marker = L.marker(v.location).addTo(map);
-            marker.bindPopup(`<a href="<%- url_for() %>/${v.url}">${key}</a>` + `<img src=${cover} style="margin-top:4px; max-width:300px" />`)
+            marker.bindPopup(`<a href="<%- url_for() %>/${v.url}">${key}</a>` + `<img src=${cover} style="margin-bottom:4px; max-width:300px" />`)
                   .openPopup();
           }
         }
