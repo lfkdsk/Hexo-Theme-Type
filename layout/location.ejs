@@ -127,6 +127,7 @@
   </style>
   <script type="text/javascript">
     var album_data = JSON.parse(`<%- JSON.stringify(site.data.album) %>`);
+    var single_data = JSON.parse(`<%- JSON.stringify(site.data.gallery) %>`);
     var keys = Object.keys(album_data)
     var map = L.map('map');
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -148,6 +149,20 @@
         // add marker
         var marker = L.marker(v.location).addTo(map);
         marker.bindPopup(`<a href="<%- url_for() %>/${v.url}">${key}</a>` + `<img src=${cover} style="margin-top:4px; max-width:300px" />`)
+          .openPopup();
+      }
+    }
+    keys = Object.keys(single_data)
+    for (const key of keys) {
+      console.log(key)
+      var v = single_data[key];
+      var file = v.url;
+      var cover = '<%- config.thumbnail_url %>' + file.substr(0, file.lastIndexOf(".")) + ".webp"
+      console.log(v)
+      if (v.hasOwnProperty('location')) {
+        // add marker
+        var marker = L.marker(v.location).addTo(map);
+        marker.bindPopup(`<a href="<%- url_for() %>${v.dir}?name=${v.name}">LINK</a>` + `<img src=${cover} style="margin-top:4px; max-width:300px" />`)
           .openPopup();
       }
     }
