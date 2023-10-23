@@ -188,8 +188,12 @@
       console.log(key)
       var v = single_data[key];
       var file = v.url;
+      if (album !== "" && album !== null) {
+        if (album != v.dir) {
+          continue
+        }
+      }
       var cover = '<%- config.thumbnail_url %>' + file.substr(0, file.lastIndexOf(".")) + ".webp"
-      console.log(v)
       if (v.hasOwnProperty('location')) {
         // add marker
         var marker = L.marker(v.location).addTo(map);
