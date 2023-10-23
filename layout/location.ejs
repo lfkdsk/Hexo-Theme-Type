@@ -27,11 +27,28 @@
     #map {
       height: 70vh;
       width: 70vw;
+      min-width: 600px;
       margin: 0 auto;
     }
 
-    @media (prefers-color-scheme: dark) {
+    .gmarker {
+      max-width: 300px;
+    }
 
+    .leaflet-popup-content {
+      min-width: 300px;
+    }
+
+    @media (max-width: 768px) {
+      .gmarker {
+        max-width: 100px;
+      }
+      .leaflet-popup-content {
+        min-width: 100px;
+      }
+    }
+
+    @media (prefers-color-scheme: dark) {
       .leaflet-layer,
       .leaflet-control-zoom-in,
       .leaflet-control-zoom-out,
@@ -120,10 +137,6 @@
         margin-top: 60px;
       }
     }
-
-    .leaflet-popup-content {
-      min-width: 300px;
-    }
   </style>
   <script type="text/javascript">
     function getParam(key) {
@@ -164,7 +177,7 @@
         }
         // add marker
         var marker = L.marker(v.location).addTo(map);
-        marker.bindPopup(`<a href="<%- url_for() %>/${v.url}">${key}</a>` + `<img src=${cover} style="margin-top:4px; max-width:300px" />`);
+        marker.bindPopup(`<a href="<%- url_for() %>/${v.url}">${key}</a>` + `<img class="gmarker nofancy" src=${cover} style="margin-top:4px;" />`);
         if (firstMark === null) {
           firstMark = marker;
         }
@@ -180,7 +193,7 @@
       if (v.hasOwnProperty('location')) {
         // add marker
         var marker = L.marker(v.location).addTo(map);
-        marker.bindPopup(`<a href="<%- url_for() %>${v.dir}?name=${v.name}">LINK</a>` + `<img src=${cover} style="margin-top:4px; max-width:300px" />`);
+        marker.bindPopup(`<a href="<%- url_for() %>${v.dir}?name=${v.name}">LINK</a>` + `<img class="gmarker nofancy" src=${cover} style="margin-top:4px;" />`);
       }
     }
     map.setView(first, 12);
