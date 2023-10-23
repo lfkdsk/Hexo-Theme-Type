@@ -1,7 +1,7 @@
 <section class="pjax-area">
   <div class="content-area album-area">
     <% if (theme.photography_page.slogan==true) { %>
-      <div class="container gpro-slogan title">
+      <div id="slogan" class="container gpro-slogan title">
         <% if (config.photography_page.travel_slogan==true) { %>
           <%- config.photography_page.travel_slogan_descr %>
             <% } else { %>
@@ -126,18 +126,34 @@
     }
   </style>
   <script type="text/javascript">
+    function getParam(key) {
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      const id = urlParams.get(key);
+      return id;
+    }
+    var album = getParam('album');
     var album_data = JSON.parse(`<%- JSON.stringify(site.data.album) %>`);
     var single_data = JSON.parse(`<%- JSON.stringify(site.data.gallery) %>`);
     var keys = Object.keys(album_data)
+    var slogan = $("#slogan")[0];
     var map = L.map('map');
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
     var first = null;
+    var firstMark = null;
     for (const key of keys) {
       console.log(key)
       var v = album_data[key];
+      // jump for non-album key.
+      if (album !== "" && album !== null) {
+        if (album != v.url) {
+          continue
+        }
+        slogan.textContent = key;
+      }
       var file = v.cover;
       var cover = '<%- config.thumbnail_url %>' + file.substr(0, file.lastIndexOf(".")) + ".webp"
       console.log(v)
@@ -148,8 +164,10 @@
         }
         // add marker
         var marker = L.marker(v.location).addTo(map);
-        marker.bindPopup(`<a href="<%- url_for() %>/${v.url}">${key}</a>` + `<img src=${cover} style="margin-top:4px; max-width:300px" />`)
-          .openPopup();
+        marker.bindPopup(`<a href="<%- url_for() %>/${v.url}">${key}</a>` + `<img src=${cover} style="margin-top:4px; max-width:300px" />`);
+        if (firstMark === null) {
+          firstMark = marker;
+        }
       }
     }
     keys = Object.keys(single_data)
@@ -162,10 +180,12 @@
       if (v.hasOwnProperty('location')) {
         // add marker
         var marker = L.marker(v.location).addTo(map);
-        marker.bindPopup(`<a href="<%- url_for() %>${v.dir}?name=${v.name}">LINK</a>` + `<img src=${cover} style="margin-top:4px; max-width:300px" />`)
-          .openPopup();
+        marker.bindPopup(`<a href="<%- url_for() %>${v.dir}?name=${v.name}">LINK</a>` + `<img src=${cover} style="margin-top:4px; max-width:300px" />`);
       }
     }
-    map.setView(first, 10);
+    map.setView(first, 12);
+    if (firstMark !== null) {
+      firstMark.openPopup();
+    }
   </script>
 </section>
