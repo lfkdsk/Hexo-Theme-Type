@@ -200,6 +200,9 @@
         marker.bindPopup(`<a href="<%- url_for() %>${v.dir}?name=${v.name}">LINK</a>` + `<img class="gmarker nofancy" src=${cover} style="margin-top:4px;" />`);
       }
     }
+    if (first === null) {
+      first = [35.026051014758096, 135.76269658252528]
+    }
     map.setView(first, 12);
     if (firstMark !== null) {
       firstMark.openPopup();
