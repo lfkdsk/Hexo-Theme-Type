@@ -30,10 +30,10 @@
     <div class="album-info <%- page.style %>-info">
       <div class="album-info-main">
         <div class="album-info-btm">
-          <% if ( page.location && page.location.length === 2 ){ %>
+          <% if ( page.location && page.location.length === 2 ) { %>
             <div class="album-location">
-              <iconpark-icon name="aiming"></iconpark-icon><a href="<%- url_for() %>location?album=<%- page.url %>">MAP: [<%- page.location[0] %>, <%- page.location[1] %>]
-            <% } %>
+              <iconpark-icon name="aiming"></iconpark-icon><a href="<%- url_for() %>location?album=<%- page.url %>">MAP: [<%- page.location[0] %>, <%- page.location[1] %>]</a>
+          <% } %>
         </div>        
         <div class="album-title"><%- page.title %></div>
         <span class="album-subtitle">
