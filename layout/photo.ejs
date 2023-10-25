@@ -54,7 +54,9 @@
           }
           const name = getParam('name');
           var imgLink = '<%- config.base_url %>' + '/' + name;
-          changeImageWith(imgLink)
+          if (name !== "" && name !== null) {
+            changeImageWith(imgLink);
+          }
         </script>
         <style>
           body {
