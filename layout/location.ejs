@@ -150,7 +150,6 @@
     var album = getParam('album');
     var album_data = JSON.parse(`<%- JSON.stringify(site.data.album) %>`);
     var single_data = JSON.parse(`<%- JSON.stringify(site.data.gallery) %>`);
-    var keys = Object.keys(album_data)
     var slogan = $("#slogan")[0];
     var map = L.map('map');
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -159,6 +158,23 @@
     }).addTo(map);
     var first = null;
     var firstMark = null;
+    var keys = Object.keys(single_data)
+    for (const key of keys) {
+      var v = single_data[key];
+      var file = v.url;
+      if (album !== "" && album !== null) {
+        if (album != v.dir) {
+          continue
+        }
+      }
+      var cover = '<%- config.thumbnail_url %>' + file.substr(0, file.lastIndexOf(".")) + ".webp"
+      if (v.hasOwnProperty('location')) {
+        // add marker
+        var marker = L.marker(v.location).addTo(map);
+        marker.bindPopup(`<a href="<%- url_for() %>${v.dir}?name=${v.name}">LINK</a>` + `<img class="gmarker nofancy" src=${cover} style="margin-top:4px;" />`);
+      }
+    }
+    keys = Object.keys(album_data)
     for (const key of keys) {
       var v = album_data[key];
       // jump for non-album key.
@@ -189,22 +205,6 @@
         if (firstMark === null) {
           firstMark = marker;
         }
-      }
-    }
-    keys = Object.keys(single_data)
-    for (const key of keys) {
-      var v = single_data[key];
-      var file = v.url;
-      if (album !== "" && album !== null) {
-        if (album != v.dir) {
-          continue
-        }
-      }
-      var cover = '<%- config.thumbnail_url %>' + file.substr(0, file.lastIndexOf(".")) + ".webp"
-      if (v.hasOwnProperty('location')) {
-        // add marker
-        var marker = L.marker(v.location).addTo(map);
-        marker.bindPopup(`<a href="<%- url_for() %>${v.dir}?name=${v.name}">LINK</a>` + `<img class="gmarker nofancy" src=${cover} style="margin-top:4px;" />`);
       }
     }
     if (first === null) {
