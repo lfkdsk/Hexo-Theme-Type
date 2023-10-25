@@ -160,7 +160,6 @@
     var first = null;
     var firstMark = null;
     for (const key of keys) {
-      console.log(key)
       var v = album_data[key];
       // jump for non-album key.
       if (album !== "" && album !== null) {
@@ -171,7 +170,6 @@
       }
       var file = v.cover;
       var cover = '<%- config.thumbnail_url %>' + file.substr(0, file.lastIndexOf(".")) + ".webp"
-      console.log(v)
       if (v.hasOwnProperty('location')) {
         // set center view.
         if (first === null) {
@@ -195,7 +193,6 @@
     }
     keys = Object.keys(single_data)
     for (const key of keys) {
-      console.log(key)
       var v = single_data[key];
       var file = v.url;
       if (album !== "" && album !== null) {

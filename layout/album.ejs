@@ -1,3 +1,8 @@
+<% for (var i in page.photos) { %>
+  <% var p = page.photos[i]; %>
+  <% var url = p.url; %>
+  <link rel="preload" href="<%- url %>" as="image" />  
+<% } %>
 <section class="pjax-area">
   <div class="content-area post-album <%- page.style %>-content-area">
     <div class="grid grid-cols-3 gap-2">
@@ -54,10 +59,6 @@
       <%- partial('_partial/comment') %>
     </div>
   <% } %>
-  <% for (var i in page.photos) { %>
-    <% var url = p.url; %>
-    <link rel="preload" href="<%- url %>" as="image" />  
-  <% } %>  
       </div>
       <script>
         var imageBox = document.getElementById("imgbox"); // imageBox 是放置大图片的图框
@@ -213,6 +214,7 @@
         }
 
         .album-item {
+          background-color: black;
           aspect-ratio: 1 / 1;
           min-height: 100px;
           min-width: 100px;
@@ -292,6 +294,14 @@
           .hint-text {
             color: white;
             opacity: 80%;
+          }
+
+          .pic-item {
+            background-color: grey;
+          }
+
+          .album-item {
+            background-color: grey;
           }
         }
 
