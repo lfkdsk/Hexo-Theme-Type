@@ -1,0 +1,236 @@
+  <section class="pjax-area">
+    <div class="content-area post-album <%- page.style %>-content-area">
+      <div class="grid grid-cols-3 gap-2">
+        <div class="pic-area fullscreen-pic">
+          <div class="pic-item" />
+          <img id="imgbox" class="pic-box" src="" />
+        </div>
+        <p id="descbox" class="text-center text-xs hint-text"> </p>
+      </div>
+      <!-- <div class="album-info <%- page.style %>-info">
+        <div class="album-info-main">
+          <div class="album-title"><%- page.title %></div>
+          <span class="album-subtitle">
+            <% var useSub = page.subtitle !== '' && page.subtitle !== null %>
+            <% console.log(page.subtitle) %>
+            <% if (useSub) { %>
+              —— <%= page.subtitle %><br />
+              <% } else { %>
+              —— <%= page.date.format(config.date_format) %><br />
+            <% } %>
+          </span>
+          <span class="album-subtitle">
+            <%= page.excerpt %>
+          </span>
+        </div>
+        <div class="album-article article <%- page.style %>-article">
+          <%- page.content %>
+        </div>
+      </div> -->
+    </div>
+    <!-- <% if ( theme.comment.use ) { %>
+      <div id="comment" class="itp-m3-card album-comment">
+        <%- partial('_partial/comment') %>
+      </div>
+    <% } %> -->
+        </div>
+        <script>
+          var imageBox = document.getElementById("imgbox"); // imageBox 是放置大图片的图框
+          var descBox = $("#descbox");
+          imgno = 0; // 进入页面时，设定初始的图片编号为0 // 定义新变量时不使用 var 则为全局变量、
+          function getParam(key) {
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            const id = urlParams.get(key)
+            console.log(id)
+            return id
+          }
+          function changeImageWith(imgLink) {
+            imageBox.src = imgLink; //替换图片
+            var imageFancy = imageBox.parentElement; // imageBox 是放置大图片的图框
+            imageFancy.setAttribute("href", imgLink);
+            var fancyBoxImage = document.getElementsByClassName("fancybox__image")[0];
+            if (fancyBoxImage !== undefined) {
+              fancyBoxImage.src = imgLink;
+            }
+            // descBox.text(desc);
+            // updateParams(name);
+          }
+          const name = getParam('name');
+          var imgLink = '<%- config.base_url %>' + '/' + name;
+          changeImageWith(imgLink)
+        </script>
+        <style>
+          body {
+            background-color: #fff;
+          }
+  
+          .album-comment {
+            max-width: 800px;
+            margin: 0 auto;
+          }
+  
+          .album-article {
+            font-size: 1.2rem;
+          }
+  
+          .hint-text {
+            color: black;
+            opacity: 60%;
+            padding-top: 4px;
+          }
+  
+          .pic-item {
+            background-color: black;
+            background-size: cover;
+            background-position: center;
+            transition: all .3s ease-in-out;
+            min-height: 200px;
+            aspect-ratio: 3 / 2;
+          }
+  
+          .pic-item > a {
+            width: 100%;
+            height: 100%;
+            display: inline-block;
+          }
+  
+          .pic-box {
+            transition: all .3s ease-in-out;
+            display: inline-block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            margin: 0 auto;
+          }
+  
+          .album-info {
+            flex-direction: column;
+            justify-content: space-between;
+            color: var(--main-black);
+          }
+  
+          .album-title {
+            font-size: 2em;
+          }
+  
+          .album-subtitle {
+            font-size: 1.2em;
+            opacity: 0.8;
+          }
+  
+  
+          .album-location {
+            display: inline-flex;
+            font-size: .8em;
+            color: #71afdd;
+            gap: 4px;
+            padding-bottom: 4px;
+          }
+  
+          .album-list {
+            padding-top: 6px;
+            overflow-x: scroll;
+          }
+  
+          .album-item {
+            background-color: black;
+            aspect-ratio: 1 / 1;
+            min-height: 100px;
+            min-width: 100px;
+            background-size: cover;
+            background-position: center;
+          }
+  
+          @media (max-width: 768px) {
+            .content-area {
+              max-width: 100vw;
+            }
+  
+            .pic-area {
+              grid-column: span 3 / span 3;
+              padding: 16px;
+            }
+  
+            .album-info {
+              grid-column: span 3 / span 3;
+              padding: 12px;
+            }
+  
+            .album-article {
+              padding: 2px;
+            }
+  
+            .album-title {
+              font-size: 1.5em;
+            }
+          }
+  
+          @media (min-width: 769px) {
+            .content-area {
+              max-width: 92%;
+              margin: 0 auto;
+              padding: 135px 16px 16px 16px;
+            }
+  
+            .album-article {
+              margin-top: 2px;
+            }
+  
+            .default-article {
+              max-height: 500px;
+              overflow-y: scroll;
+            }
+  
+            .pic-area {
+              grid-column: span 2 / span 2;
+            }
+  
+            .album-info {
+              grid-column: span 1 / span 1;
+              margin-left: 12px;
+            }
+          }
+  
+          @media (min-width: 1304px) {
+            .content-area {
+              max-width: 1400px;
+            }
+  
+            .fullscreen-content-area {
+              max-width: 100vh;
+            }
+          }
+  
+          @media (prefers-color-scheme: dark) {
+            .album-info {
+              color: #fff;
+            }
+  
+            .album-location {
+              color: #bdbdbd;
+            }
+  
+            .hint-text {
+              color: white;
+              opacity: 80%;
+            }
+  
+            .pic-item {
+              background-color: grey;
+            }
+  
+            .album-item {
+              background-color: grey;
+            }
+          }
+  
+          .fullscreen-pic {
+            grid-column: span 3 / span 3;
+          }
+  
+          .fullscreen-info {
+            grid-column: span 3 / span 3;
+          }
+        </style>
+  </section>

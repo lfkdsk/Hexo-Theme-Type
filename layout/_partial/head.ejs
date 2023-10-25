@@ -125,6 +125,8 @@
   <% } else if ( theme.cdn.use == 'self_host') { %>
   <script src="<%- url_for('/js/jquery.min.js') %>"></script>
   <% } %>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"/>
   <!--Comment-->
   <% if(theme.comment.use == 'none') { %>
   <% } else if (theme.comment.use == 'cusdis') { %>
