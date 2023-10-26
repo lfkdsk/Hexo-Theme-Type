@@ -3,7 +3,7 @@
         <div class="grid grid-cols-3 gap-2">
             <div class="pic-area fullscreen-pic">
                 <div class="pic-item" />
-                <img id="imgbox" class="nofancy pic-box" />
+                <img id="imgbox" class="pic-box" />
             </div>
             <p id="descbox" class="text-center text-xs hint-text"> </p>
         </div>
@@ -33,6 +33,12 @@
             if (v !== null) {
                 var imgLink = '<%- config.base_url %>' + '/' + v.path;
                 imageBox.src = imgLink;
+                var imageFancy = imageBox.parentElement; // imageBox 是放置大图片的图框
+                imageFancy.setAttribute("href", imgLink);
+                var fancyBoxImage = document.getElementsByClassName("fancybox__image")[0];
+                if (fancyBoxImage !== undefined) {
+                    fancyBoxImage.src = imgLink;
+                }
                 if (v.exif === "") {
                     descBox.text(v.desc);
                 } else {
