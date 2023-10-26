@@ -1,4 +1,4 @@
-  <section class="pjax-area">
+<section class="pjax-area">
     <div class="content-area post-album content-area">
       <div class="grid grid-cols-3 gap-2">
         <div class="pic-area fullscreen-pic">
@@ -37,25 +37,19 @@
         <script>
           var imageBox = document.getElementById("imgbox"); // imageBox 是放置大图片的图框
           var descBox = $("#descbox");
-          imgno = 0; // 进入页面时，设定初始的图片编号为0 // 定义新变量时不使用 var 则为全局变量、
-          function getParam(key) {
-            const queryString = window.location.search;
-            const urlParams = new URLSearchParams(queryString);
-            const id = urlParams.get(key)
-            console.log(id)
-            return id
-          }
-          const name = getParam('name');
-          var imgLink = '<%- config.base_url %>' + '/' + name;
-          if (name !== "" && name !== null) {
-            imageBox.src = imgLink; //替换图片
-              var all = JSON.parse(`<%- JSON.stringify(site.data.photos) %>`);
-              for (const key of Object.keys(all)) {
-                  var v = all[key];
-                  if (v.path === name) {
-                    descBox.text(v.exif);
-                  }
-              }
+          const all = JSON.parse(`<%- JSON.stringify(site.data.photos) %>`);
+          const keys = Object.keys(all);
+          const max = keys.length;
+          const random = Math.floor(Math.random() * max);
+          const key = keys[random];
+          const v = all[key];
+          console.log(all.length);
+ 
+          console.log(v);
+          if (v !== null) {
+            var imgLink = '<%- config.base_url %>' + '/' + v.path;
+            imageBox.src = imgLink;
+            descBox.text(v.exif);
           }
         </script>
         <style>

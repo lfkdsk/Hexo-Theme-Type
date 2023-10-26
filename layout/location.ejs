@@ -149,7 +149,8 @@
     }
     var album = getParam('album');
     var album_data = JSON.parse(`<%- JSON.stringify(site.data.album) %>`);
-    var single_data = JSON.parse(`<%- JSON.stringify(site.data.gallery) %>`);
+    var single_data = JSON.parse(`<%- JSON.stringify(site.data.location) %>`);
+
     var slogan = $("#slogan")[0];
     var map = L.map('map');
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -159,21 +160,23 @@
     var first = null;
     var firstMark = null;
     var keys = Object.keys(single_data)
+    // photos data.
     for (const key of keys) {
       var v = single_data[key];
-      var file = v.url;
+      var file = v.path;
       if (album !== "" && album !== null) {
         if (album != v.dir) {
           continue
         }
       }
       var cover = '<%- config.thumbnail_url %>' + file.substr(0, file.lastIndexOf(".")) + ".webp"
-      if (v.hasOwnProperty('location')) {
+      if (v.hasOwnProperty('location') && v.location.length !== 0) {
         // add marker
         var marker = L.marker(v.location).addTo(map);
         marker.bindPopup(`<a href="<%- url_for() %>${v.dir}?name=${v.name}">LINK</a>` + `<img class="gmarker nofancy" src=${cover} style="margin-top:4px;" />`);
       }
     }
+    // album data
     keys = Object.keys(album_data)
     for (const key of keys) {
       var v = album_data[key];
@@ -186,7 +189,7 @@
       }
       var file = v.cover;
       var cover = '<%- config.thumbnail_url %>' + file.substr(0, file.lastIndexOf(".")) + ".webp"
-      if (v.hasOwnProperty('location')) {
+      if (v.hasOwnProperty('location') && v.location.length !== 0) {
         // set center view.
         if (first === null) {
           first = v.location;
