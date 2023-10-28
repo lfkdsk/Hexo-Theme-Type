@@ -1,71 +1,83 @@
+<script src="js/html2canvas.min.js"></script>
 <section class="pjax-area">
     <%- include('_partial/single-photo.ejs') %>
-    <script>
-        var imageBox = document.getElementById("imgbox"); // imageBox 是放置大图片的图框
-        var descBox = $("#descbox");
-        var nextBox = $("#nextbox");
-        var copyBox = $("#copybox");
-        var wrapper = $("#exif-wrapper");
-        var exifParam = $("#exif-param");
-        var exifMaker = $("#exif-maker");
-        var exifDate = $("#exif-date");
-        var exifLens = $("#exif-lens");
-        var exifLogo = $("#exif-maker-logo");
-        var normalWrapper = $("#normal-wrapper");
-        var normalData = $("#no-exif-data");
-        const all = JSON.parse(`<%- JSON.stringify(site.data.photos) %>`);
-        const keys = Object.keys(all);
-        const max = keys.length;
-        var value = null;
-        function nextImage() {
-            var random = Math.floor(Math.random() * max);
-            var key = keys[random];
-            var v = all[key];
-            value = v;
-            if (v === null) {
-                return;
-            }
-            var imgLink = '<%- config.base_url %>' + '/' + v.path;
-            imageBox.src = imgLink;
-            var imageFancy = imageBox.parentElement;
-            imageFancy.setAttribute("href", imgLink);
-            var fancyBoxImage = document.getElementsByClassName("fancybox__image")[0];
-            if (fancyBoxImage !== undefined) {
-                fancyBoxImage.src = imgLink;
-            }
-            if (v.exif === "" || v.exif_data.length === 0) {
-                wrapper.hide();
-                normalWrapper.show();
-                normalData.text("Shot By " + "<%- config.author %>");
-                return;
-            } else {
-                wrapper.show();
-                normalWrapper.hide();
-            }
-            const maker = v.exif_data['Image Make'];
-            switch (maker) {
-                case 'Apple': {
-                    exifLogo.attr('src', 'img/apple.png');
-                    break;
+        <script>
+            var imageBox = document.getElementById("imgbox"); // imageBox 是放置大图片的图框
+            var descBox = $("#descbox");
+            var nextBox = $("#nextbox");
+            var copyBox = $("#copybox");
+            var wrapper = $("#exif-wrapper");
+            var exifParam = $("#exif-param");
+            var exifMaker = $("#exif-maker");
+            var exifDate = $("#exif-date");
+            var exifLens = $("#exif-lens");
+            var exifLogo = $("#exif-maker-logo");
+            var exifAuthor = $("#exif-author");
+            var normalWrapper = $("#normal-wrapper");
+            var normalData = $("#no-exif-data");
+            var download = $("#downloadbox");
+            const all = JSON.parse(`<%- JSON.stringify(site.data.photos) %>`);
+            const keys = Object.keys(all);
+            const max = keys.length;
+            var value = null;
+            var name = null;
+            function nextImage() {
+                var random = Math.floor(Math.random() * max);
+                var key = keys[random];
+                var v = all[key];
+                value = v;
+                if (v === null) {
+                    return;
                 }
-                default:
-                case 'FUJIFILM': {
-                    exifLogo.attr('src', 'img/fujifilm.png');
-                    break;
+                var imgLink = '<%- config.base_url %>' + '/' + v.path;
+                imageBox.src = imgLink;
+                var imageFancy = imageBox.parentElement;
+                imageFancy.setAttribute("href", imgLink);
+                var fancyBoxImage = document.getElementsByClassName("fancybox__image")[0];
+                if (fancyBoxImage !== undefined) {
+                    fancyBoxImage.src = imgLink;
+                }
+                name = v.name;
+                if (v.exif === "" || v.exif_data.length === 0) {
+                    wrapper.hide();
+                    normalWrapper.show();
+                    normalData.text("Shot By " + "<%- config.author %>");
+                    return;
+                } else {
+                    wrapper.show();
+                    normalWrapper.hide();
+                }
+                const maker = v.exif_data['Image Make'];
+                switch (maker) {
+                    case 'Apple': {
+                        exifLogo.attr('src', 'img/apple.png');
+                        break;
+                    }
+                    default:
+                    case 'FUJIFILM': {
+                        exifLogo.attr('src', 'img/fujifilm.png');
+                        break;
+                    }
+                }
+                exifLens.text(v.exif_data['EXIF LensModel']);
+                exifMaker.text(v.exif_data['Image Make'] + ' ' + v.exif_data['Image Model'])
+                exifDate.text(v.exif_data['EXIF DateTimeOriginal']);
+                exifAuthor.text("By " + "<%- config.author %>")
+                exifParam.text(v.exif_data['EXIF ISOSpeedRatings'] + ' ' + v.exif_data['EXIF FNumber'] + ' ' + v.exif_data['EXIF ExposureTime']);
+            }
+            function copyLink() {
+                if (value !== null) {
+                    copyToClipboard('<%- config.url %>/photo?name=' + value.path);
                 }
             }
-            exifLens.text(v.exif_data['EXIF LensModel']);
-            exifMaker.text(v.exif_data['Image Make'] + ' ' + v.exif_data['Image Model'])
-            exifDate.text(v.exif_data['EXIF DateTimeOriginal']);
-            exifParam.text(v.exif_data['EXIF ISOSpeedRatings'] + ' ' + v.exif_data['EXIF FNumber'] + ' ' + v.exif_data['EXIF ExposureTime']);
-        }
-        function copyLink() {
-            if (value !== null) {
-                copyToClipboard('<%- config.url %>/photo?name=' + value.path);
-            }
-        }
-        nextBox.click(nextImage);
-        copyBox.click(copyLink);
-        nextImage();
-    </script>
+            nextBox.click(nextImage);
+            copyBox.click(copyLink);
+            nextImage();
+            download.click(function () {
+                var node = document.getElementById('all-pic');
+                html2canvas(node, {useCORS: true, allowTaint: true}).then(function (canvas) {
+                    simulateDownloadImageClick(canvas.toDataURL(), name + '.png');
+                });
+            });        
+        </script>
 </section>

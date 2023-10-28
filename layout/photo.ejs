@@ -14,7 +14,6 @@
             var exifLogo = $("#exif-maker-logo");
             var normalWrapper = $("#normal-wrapper");
             var normalData = $("#no-exif-data");
-
             const name = getParam('name');
             var imgLink = '<%- config.base_url %>' + '/' + name;
             $("#tools-wrapper").hide();
@@ -65,6 +64,7 @@
                     exifParam.text(v.exif_data['EXIF ISOSpeedRatings'] + ' ' + v.exif_data['EXIF FNumber'] + ' ' + v.exif_data['EXIF ExposureTime']);
                 }
             }
+
             searchPhoto();
         </script>
 </section>
