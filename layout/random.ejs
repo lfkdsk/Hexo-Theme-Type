@@ -1,264 +1,71 @@
 <section class="pjax-area">
-    <div class="content-area post-album fullscreen-content-area">
-        <div class="grid grid-cols-3 gap-2">
-            <div class="pic-area fullscreen-pic">
-                <div class="pic-item" />
-                <img id="imgbox" class="pic-box" />
-            </div>
-            <p id="descbox" class="text-center text-xs hint-text"> </p>
-        </div>
-        <div class="album-info fullscreen-info">
-            <button id="nextbox" class="album-next-one">NEXT ONE</button>
-            <div class="album-info-main">
-            </div>
-        </div>
-    </div>
-    <!-- <% if ( theme.comment.use ) { %>
-      <div id="comment" class="itp-m3-card album-comment">
-        <%- partial('_partial/comment') %>
-      </div>
-    <% } %> -->
-    </div>
+    <%- include('_partial/single-photo.ejs') %>
     <script>
         var imageBox = document.getElementById("imgbox"); // imageBox 是放置大图片的图框
         var descBox = $("#descbox");
         var nextBox = $("#nextbox");
+        var copyBox = $("#copybox");
+        var wrapper = $("#exif-wrapper");
+        var exifParam = $("#exif-param");
+        var exifMaker = $("#exif-maker");
+        var exifDate = $("#exif-date");
+        var exifLens = $("#exif-lens");
+        var exifLogo = $("#exif-maker-logo");
+        var normalWrapper = $("#normal-wrapper");
+        var normalData = $("#no-exif-data");
         const all = JSON.parse(`<%- JSON.stringify(site.data.photos) %>`);
         const keys = Object.keys(all);
         const max = keys.length;
+        var value = null;
         function nextImage() {
             var random = Math.floor(Math.random() * max);
             var key = keys[random];
             var v = all[key];
-            if (v !== null) {
-                var imgLink = '<%- config.base_url %>' + '/' + v.path;
-                imageBox.src = imgLink;
-                var imageFancy = imageBox.parentElement; // imageBox 是放置大图片的图框
-                imageFancy.setAttribute("href", imgLink);
-                var fancyBoxImage = document.getElementsByClassName("fancybox__image")[0];
-                if (fancyBoxImage !== undefined) {
-                    fancyBoxImage.src = imgLink;
+            value = v;
+            if (v === null) {
+                return;
+            }
+            var imgLink = '<%- config.base_url %>' + '/' + v.path;
+            imageBox.src = imgLink;
+            var imageFancy = imageBox.parentElement;
+            imageFancy.setAttribute("href", imgLink);
+            var fancyBoxImage = document.getElementsByClassName("fancybox__image")[0];
+            if (fancyBoxImage !== undefined) {
+                fancyBoxImage.src = imgLink;
+            }
+            if (v.exif === "" || v.exif_data.length === 0) {
+                wrapper.hide();
+                normalWrapper.show();
+                normalData.text("Shot By " + "<%- config.author %>");
+                return;
+            } else {
+                wrapper.show();
+                normalWrapper.hide();
+            }
+            const maker = v.exif_data['Image Make'];
+            switch (maker) {
+                case 'Apple': {
+                    exifLogo.attr('src', 'img/apple.png');
+                    break;
                 }
-                if (v.exif === "") {
-                    descBox.text(v.desc);
-                } else {
-                    descBox.text(v.exif);
+                default:
+                case 'FUJIFILM': {
+                    exifLogo.attr('src', 'img/fujifilm.png');
+                    break;
                 }
+            }
+            exifLens.text(v.exif_data['EXIF LensModel']);
+            exifMaker.text(v.exif_data['Image Make'] + ' ' + v.exif_data['Image Model'])
+            exifDate.text(v.exif_data['EXIF DateTimeOriginal']);
+            exifParam.text(v.exif_data['EXIF ISOSpeedRatings'] + ' ' + v.exif_data['EXIF FNumber'] + ' ' + v.exif_data['EXIF ExposureTime']);
+        }
+        function copyLink() {
+            if (value !== null) {
+                copyToClipboard('<%- config.url %>/photo?name=' + value.path);
             }
         }
         nextBox.click(nextImage);
+        copyBox.click(copyLink);
         nextImage();
     </script>
-    <style>
-        body {
-            background-color: #fff;
-        }
-
-        .album-comment {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .album-article {
-            font-size: 1.2rem;
-        }
-
-        .hint-text {
-            color: black;
-            opacity: 60%;
-            padding-top: 4px;
-        }
-
-        .pic-item {
-            background-color: black;
-            background-size: cover;
-            background-position: center;
-            transition: all .3s ease-in-out;
-            min-height: 200px;
-            aspect-ratio: 3 / 2;
-        }
-
-        .pic-item>a {
-            width: 100%;
-            height: 100%;
-            display: inline-block;
-        }
-
-        .pic-box {
-            transition: all .3s ease-in-out;
-            display: inline-block;
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            margin: 0 auto;
-        }
-
-        .album-info {
-            flex-direction: column;
-            justify-content: space-between;
-            color: var(--main-black);
-        }
-
-        .album-title {
-            font-size: 2em;
-        }
-
-        .album-subtitle {
-            font-size: 1.2em;
-            opacity: 0.8;
-        }
-
-
-        .album-location {
-            display: inline-flex;
-            font-size: .8em;
-            color: #71afdd;
-            gap: 4px;
-            padding-bottom: 4px;
-        }
-
-        .album-list {
-            padding-top: 6px;
-            overflow-x: scroll;
-        }
-
-        .album-item {
-            background-color: black;
-            aspect-ratio: 1 / 1;
-            min-height: 100px;
-            min-width: 100px;
-            background-size: cover;
-            background-position: center;
-        }
-
-        .album-next-one {
-            display: block;
-            text-align: center;
-            border-style: solid;
-            border-color: black;
-            background-color: white;
-            margin: 0 auto;
-            padding: 1em 1.5em;
-            border-width: 2px;
-            font-weight: bold;
-        }
-
-        .album-next-one:hover {
-            background-color: black;
-            color: white;
-        }
-
-        .album-next-one:active {
-            background-color: white;
-            color: black;
-        }
-
-        @media (max-width: 768px) {
-            .content-area {
-                max-width: 100vw;
-            }
-
-            .pic-area {
-                grid-column: span 3 / span 3;
-                padding: 16px;
-            }
-
-            .album-info {
-                grid-column: span 3 / span 3;
-                padding: 12px;
-            }
-
-            .album-article {
-                padding: 2px;
-            }
-
-            .album-title {
-                font-size: 1.5em;
-            }
-        }
-
-        @media (min-width: 769px) {
-            .content-area {
-                max-width: 92%;
-                margin: 0 auto;
-                padding: 135px 16px 16px 16px;
-            }
-
-            .album-article {
-                margin-top: 2px;
-            }
-
-            .default-article {
-                max-height: 500px;
-                overflow-y: scroll;
-            }
-
-            .pic-area {
-                grid-column: span 2 / span 2;
-            }
-
-            .album-info {
-                grid-column: span 1 / span 1;
-            }
-        }
-
-        @media (min-width: 1304px) {
-            .content-area {
-                max-width: 1400px;
-            }
-
-            .fullscreen-content-area {
-                max-height: 80vh;
-                max-width: 100vh;
-            }
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .album-info {
-                color: #fff;
-            }
-
-            .album-location {
-                color: #bdbdbd;
-            }
-
-            .hint-text {
-                color: white;
-                opacity: 80%;
-            }
-
-            .pic-item {
-                background-color: black;
-            }
-
-            .album-item {
-                background-color: black;
-            }
-
-            .album-next-one {
-                border-color: white;
-                background-color: black;
-                color: white;
-            }
-
-            .album-next-one:hover {
-                color: black;
-                background-color: white;
-            }
-
-            .album-next-one:active {
-                border-color: white;
-                background-color: black;
-                color: white;
-            }
-        }
-
-        .fullscreen-pic {
-            grid-column: span 3 / span 3;
-        }
-
-        .fullscreen-info {
-            grid-column: span 3 / span 3;
-        }
-    </style>
 </section>
