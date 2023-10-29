@@ -1,4 +1,4 @@
-<script src="js/html2canvas.min.js"></script>
+<script src="js/html2canvas.js"></script>
 <section class="pjax-area">
     <%- include('_partial/single-photo.ejs') %>
         <script>
@@ -75,8 +75,14 @@
             nextImage();
             download.click(function () {
                 var node = document.getElementById('all-pic');
-                html2canvas(node, {useCORS: true, allowTaint: true}).then(function (canvas) {
-                    simulateDownloadImageClick(canvas.toDataURL(), name + '.png');
+                html2canvas(node, {
+                    useCORS: true, 
+                    allowTaint: true,
+                    scrollX: 0, 
+                    scrollY: 0,
+                }).then(function (canvas) {
+                    // document.body.appendChild(canvas)
+                    simulateDownloadImageClick(canvas.toDataURL('image/png'), name + '.png');
                 });
             });        
         </script>

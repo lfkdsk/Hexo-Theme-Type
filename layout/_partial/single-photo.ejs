@@ -14,10 +14,12 @@
                     <img id="exif-maker-logo" class="nofancy"></img>
                 </div>
                 <div style="margin-left: 10px; width: 1px; background-color: black;"></div>
-                <div style="padding-left: 10px; display: flex; flex-direction: column; justify-content: center;">
-                    <div id="exif-maker"></div>
-                    <div id="exif-lens"></div>
-                    <div id="exif-author"></div>
+                <div style="padding-left: 10px; position: relative;">
+                    <div style="display: flex; flex-direction: column; justify-content: center;">
+                        <div id="exif-maker"></div>
+                        <div id="exif-lens"></div>
+                        <div id="exif-author"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -40,6 +42,10 @@
 <style>
     body {
         background-color: #fff;
+    }
+
+    .screenshot {
+        display: flex;
     }
 
     #nextbox,
@@ -215,23 +221,23 @@
         }
 
         .pic-wrapper {
-            padding: 10px 0px;
+            padding: 4px 0px;
         }
 
         #exif-param {
-            font-size: .6em;
+            font-size: .5rem;
         }
         #exif-date {
-            font-size: .8em;
+            font-size: .6rem;
         }
         #exif-maker {
-            font-size: .4em;
+            font-size: .4rem;
         }
         #exif-lens, #exif-author {
-            font-size: .6em;
+            font-size: .6rem;
         }
         #exif-maker-logo {
-            height: 40px;
+            height: 30px;
         }
     }
 
