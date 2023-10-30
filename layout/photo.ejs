@@ -24,7 +24,7 @@
                     return;
                 }
 
-                // imageBox.src = imgLink; //替换图片
+                imageBox.src = imgLink; //替换图片
                 var all = JSON.parse(`<%- JSON.stringify(site.data.photos) %>`);
                 for (const key of Object.keys(all)) {
                     var v = all[key];
