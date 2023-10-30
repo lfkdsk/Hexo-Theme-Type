@@ -23,7 +23,7 @@
                     return;
                 }
 
-                imageBox.src = imgLink; //替换图片
+                // imageBox.src = imgLink; //替换图片
                 var all = JSON.parse(`<%- JSON.stringify(site.data.photos) %>`);
                 for (const key of Object.keys(all)) {
                     var v = all[key];
@@ -46,22 +46,7 @@
                         wrapper.show();
                         normalWrapper.hide();
                     }
-                    const maker = v.exif_data['Image Make'];
-                    switch (maker) {
-                        case 'Apple': {
-                            exifLogo.attr('src', 'img/apple.png');
-                            break;
-                        }
-                        default:
-                        case 'FUJIFILM': {
-                            exifLogo.attr('src', 'img/fujifilm.png');
-                            break;
-                        }
-                    }
-                    exifLens.text(v.exif_data['EXIF LensModel']);
-                    exifMaker.text(v.exif_data['Image Make'] + ' ' + v.exif_data['Image Model'])
-                    exifDate.text(v.exif_data['EXIF DateTimeOriginal']);
-                    exifParam.text(v.exif_data['EXIF ISOSpeedRatings'] + ' ' + v.exif_data['EXIF FNumber'] + ' ' + v.exif_data['EXIF ExposureTime']);
+                    wrapperData(v, "<%- config.author %>");
                 }
             }
 
