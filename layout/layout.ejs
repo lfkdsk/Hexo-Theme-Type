@@ -1,7 +1,9 @@
 <!-- @format -->
 
-<% if(page.layout==='html' ) { %>
+<% if( page.layout==='html') { %>
 <%- page.content %>
+<% } if( page.layout === 'rss') { %>
+<%- include('rss') %>
 <% } else { %>
 
 <!DOCTYPE html>

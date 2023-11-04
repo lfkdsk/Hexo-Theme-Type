@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<rss version="2.0">
+    <channel>
+        <title><%= config.title %></title>
+        <link><%= config.url %></link>
+        <description><%= config.description %></description>
+        <language><%= config.language %></language>
+        <% var visited = false; %>
+        <% for (var key in site.data.album) { %>
+        <% var post = site.data.album[key] %>
+        <% if (!visited) { %>
+        <updated><%= post.date %></updated>
+        <% visited = true; %>
+        <% } %>
+        <item>
+            <guid isPermalink="true"><%= post.url %></guid>
+            <title><%= key %></title>
+            <link><%= post.url %></link>
+            <pubDate><%= post.date %></pubDate>
+            <description><%= config.url %>/<%= post.cover %></description>
+        </item>
+        <%_ } _%>
+    </channel>
+</rss>
