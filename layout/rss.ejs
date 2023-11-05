@@ -3,21 +3,17 @@
     <channel>
         <title><%= config.title %></title>
         <link><%= config.url %></link>
+        <% const albums = site.pages.filter(i => i.layout === 'album') %>
         <description><%= config.description %></description>
         <language><%= config.language %></language>
-        <% var visited = false; %>
-        <% for (var key in site.data.album) { %>
-        <% var post = site.data.album[key] %>
-        <% if (!visited) { %>
-        <updated><%= post.date %></updated>
-        <% visited = true; %>
-        <% } %>
+        <updated><%= albums.first().date.toISOString() %></updated>
+        <% for (var post of albums.data) { %>
         <item>
-            <guid isPermalink="true"><%= post.url %></guid>
-            <title><%= key %></title>
-            <link><%= post.url %></link>
-            <pubDate><%= post.date %></pubDate>
-            <description><%= config.url %>/<%= post.cover %></description>
+            <title><%= post.title %></title>
+            <guid isPermalink="true"><%- config.url %>/<%- post.url %></guid>
+            <link><%- config.url %>/<%- post.url %></link>
+            <pubDate><%= post.date.toISOString() %></pubDate>          
+            <content type="html"><![CDATA[ <%= post.rss %> ]]></content>
         </item>
         <%_ } _%>
     </channel>
