@@ -4,6 +4,13 @@
         <title><%= config.title %></title>
         <link><%= config.url %></link>
         <% const albums = site.pages.filter(i => i.layout === 'album') %>
+        <% 
+        albums.sort(function(a,b){
+            // Turn your strings into dates, and then subtract them
+            // to get a value that is either negative, positive, or zero.
+            return new Date(b.date) - new Date(a.date);
+          });
+        %>
         <description><%= config.description %></description>
         <language><%= config.language %></language>
         <updated><%= albums.first().date.toISOString() %></updated>
@@ -14,7 +21,7 @@
             <guid isPermalink="true"><%- config.url %>/<%- post.url %></guid>
             <link><%- config.url %>/<%- post.url %></link>
             <pubDate><%= post.date.toISOString() %></pubDate>          
-            <description type="html"><![CDATA[ <%= post.rss %> ]]></description>
+            <description type="html"><![CDATA[ <%- post.rss %> ]]></description>
         </item>
         <%_ } _%>
     </channel>
