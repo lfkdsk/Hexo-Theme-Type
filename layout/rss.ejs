@@ -20,8 +20,8 @@
             <media:content medium="image" url="<%= post.cover %>" width="300" height="200" />            
             <guid isPermalink="true"><%- config.url %>/<%- post.url %></guid>
             <link><%- config.url %>/<%- post.url %></link>
-            <pubDate><%= post.date.toISOString() %></pubDate>          
-            <description type="html"><![CDATA[ <%- post.rss %> ]]></description>
+            <pubDate><%= post.date.toISOString() %></pubDate>       
+            <description type="html"><![CDATA[ <%- post.rss.join(' ') %> ]]></description>
         </item>
         <%_ } _%>
     </channel>
