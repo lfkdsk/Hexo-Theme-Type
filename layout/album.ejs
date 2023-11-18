@@ -1,11 +1,14 @@
 <section class="pjax-area">
   <div class="content-area post-album <%- page.style %>-content-area">
-    <div class="grid grid-cols-3 gap-2">
-      <div class="pic-area <%- page.style %>-pic">
-        <div class="pic-item" />
-        <img id="imgbox" class="pic-box" src="<%- page.photos[0].url %>" />
+    <div class="grid grid-cols-3">
+      <div class="<%- page.style %>-pic gap-2 wrapper">
+        <div class="pic-area">
+          <div class="pic-item" />
+          <img id="imgbox" class="pic-box" src="<%- page.photos[0].url %>" />
+        </div>
+        <%- include('_partial/exif.ejs') %>  
       </div>
-      <p id="descbox" class="text-center text-xs hint-text"> <%- page.photos[0].desc %> </p>
+      <p id="descbox" class="text-center text-xs hint-text" hidden> <%- page.photos[0].desc %> </p>
       <div class="album-list flex gap-2">
         <% for (var i in page.photos) { %>
           <% var p = page.photos[i]; %>
@@ -14,10 +17,22 @@
           <% var thum = p.thum; %>
           <% var desc = p.desc; %>
           <% var share = p.share; %>
+          <%
+          function searchPhoto(data, url) {
+            for (var key in data) {
+              if (key.toString() == url) {
+                return data[key]
+              }
+            }
+            return {}
+          }          
+          %>
+          <% var extra = searchPhoto(site.data.photos, share) %>
           <a class="album-item lazy" id="<%- i %>"
             name="<%- name %>" rel="<%- url %>"
             desc=" <%- desc %> "
             share="<%- share %>"
+            extra='<%- JSON.stringify(extra) %>'
             href="javascript:void(0);" onClick="changeimg(event)" data-src="<%- thum %>"
             aria-label="the photo <%- i %>"></a>
           <% } %>
@@ -29,7 +44,7 @@
         <div class="album-info-btm">
           <% if ( page.location && page.location.length === 2 ) { %>
             <div class="album-location album-tool">
-              <iconpark-icon name="aiming"></iconpark-icon><a href="<%- url_for() %>location?album=<%- page.url %>">MAP: [<%- page.location[0] %>, <%- page.location[1] %>]</a>
+              <iconpark-icon name="aiming"></iconpark-icon><a href="<%- url_for() %>location?album=<%- page.url %>">MAP</a>
             </div>
           <% } %>
           <div class="album-share album-tool">
@@ -69,12 +84,35 @@
       <script>
         var imageBox = document.getElementById("imgbox"); // imageBox 是放置大图片的图框
         var descBox = $("#descbox");
+        var wrapper = $("#exif-wrapper");
+        var exifParam = $("#exif-param");
+        var exifMaker = $("#exif-maker");
+        var exifDate = $("#exif-date");
+        var exifLens = $("#exif-lens");
+        var exifLogo = $("#exif-maker-logo");
+        var exifAuthor = $("#exif-author");
+        var normalWrapper = $("#normal-wrapper");
+        var normalData = $("#no-exif-data");
+
         imgno = 0; // 进入页面时，设定初始的图片编号为0 // 定义新变量时不使用 var 则为全局变量、
+        function changeExifData(v) {
+          console.log(Object.keys(v.exif_data))
+          if (Object.keys(v.exif_data).length === 0) {
+            wrapper.hide();
+            normalWrapper.show();
+            normalData.text("Shot By " + "<%- config.author %>");
+          } else {
+            wrapper.show();
+            normalWrapper.hide();
+            wrapperData(v, "<%- config.author %>");
+          }
+        }
         function changeImageWith(target) {
           imgno = target.getAttribute('id'); 
           var imgLink = target.getAttribute('rel');
           var name = target.getAttribute('name');
           var desc = target.getAttribute('desc');
+          var v = JSON.parse(target.getAttribute('extra'));
           imageBox.src = '';
           imageBox.src = imgLink; //替换图片
           imageBox.setAttribute("share", target.getAttribute('share'));
@@ -86,6 +124,7 @@
           }
           target.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })
           descBox.text(desc);
+          changeExifData(v);
           updateParams(name);
         }
         function cheangeImageInSelector() {
@@ -104,8 +143,11 @@
           changeImageWithName(name)
         } else {
           var value = $(`#0`)[0];
+          var v = JSON.parse(value.getAttribute('extra'));
+          changeExifData(v);
           imageBox.setAttribute("share", value.getAttribute('share'));
         }
+        // key
         window.onkeydown = function album_hotkey() {
           //[键盘快捷键] 左箭头 上一张
           if (event.keyCode === 37) {
@@ -206,7 +248,7 @@
         }
 
         .album-list {
-          padding-top: 6px;
+          padding-top: 12px;
           overflow-x: scroll;
         }
 
@@ -226,7 +268,11 @@
 
           .pic-area {
             grid-column: span 3 / span 3;
-            padding: 16px;
+            padding: 8px 8px 0 8px;
+          }
+
+          .default-pic {
+            grid-column: span 3 / span 3;
           }
 
           .album-info {
@@ -241,13 +287,17 @@
           .album-title {
             font-size: 1.5em;
           }
+
+          .wrapper {
+            padding: 8px;
+          }
         }
 
         @media (min-width: 769px) {
           .content-area {
             max-width: 92%;
             margin: 0 auto;
-            padding: 135px 16px 16px 16px;
+            padding: 115px 16px 16px 16px;
           }
 
           .album-article {
@@ -263,9 +313,12 @@
             grid-column: span 2 / span 2;
           }
 
+          .default-pic {
+            grid-column: span 2 / span 2;
+          }
+
           .album-info {
             grid-column: span 1 / span 1;
-            margin-left: 12px;
           }
         }
 
