@@ -1,8 +1,9 @@
+<script src="js/html2canvas.js"></script>
 <section class="pjax-area">
   <div class="content-area post-album <%- page.style %>-content-area">
     <div class="grid grid-cols-3">
       <div class="<%- page.style %>-pic gap-2 wrapper">
-        <div class="pic-area">
+        <div id="all-pic" class="pic-area">
           <div class="pic-item" />
           <img id="imgbox" class="pic-box" src="<%- page.photos[0].url %>" />
         </div>
@@ -44,11 +45,14 @@
         <div class="album-info-btm">
           <% if ( page.location && page.location.length === 2 ) { %>
             <div class="album-location album-tool">
-              <iconpark-icon name="aiming"></iconpark-icon><a href="<%- url_for() %>location?album=<%- page.url %>">MAP</a>
+              <iconpark-icon name="local-two"></iconpark-icon><a href="<%- url_for() %>location?album=<%- page.url %>">MAP</a>
             </div>
           <% } %>
           <div class="album-share album-tool">
-            <iconpark-icon name="aiming"></iconpark-icon><a id="share" href="javascript:void(0)"> Share Link. </a>
+            <iconpark-icon name="share-three"></iconpark-icon><a id="share" href="javascript:void(0)"> Share Link </a>
+          </div>
+          <div class="album-share album-tool">
+            <iconpark-icon name="down-picture"></iconpark-icon><a id="download" href="javascript:void(0)"> Download </a>
           </div>
         </div>        
         <div class="album-title"><%- page.title %></div>
@@ -137,16 +141,28 @@
           var value = $(`[name='${name}']`)[0];
           changeImageWith(value)
         };
-        const name = getParam('name')
+        var name = getParam('name')
         const len = +'<%= page.photos.length %>'
-        if (name !== "" && name !== null) {
+        if (name !== "" && name !== null && name !== 'null') {
           changeImageWithName(name)
         } else {
           var value = $(`#0`)[0];
+          name = value.getAttribute('name');
           var v = JSON.parse(value.getAttribute('extra'));
           changeExifData(v);
           imageBox.setAttribute("share", value.getAttribute('share'));
         }
+        $('#download').click(function () {
+          var node = document.getElementById('all-pic');
+          html2canvas(node, {
+            useCORS: true,
+            allowTaint: true,
+            scrollX: 0,
+            scrollY: 0,
+          }).then(function (canvas) {                  
+            simulateDownloadImageClick(canvas.toDataURL('image/png'),  name + '.png');
+          });
+        });        
         // key
         window.onkeydown = function album_hotkey() {
           //[键盘快捷键] 左箭头 上一张
@@ -183,6 +199,14 @@
         body {
           background-color: #fff;
         }
+
+        .fullscreen-pic {
+          grid-column: span 3 / span 3;
+        }
+
+        .fullscreen-info {
+          grid-column: span 3 / span 3;
+        }        
 
         .album-comment {
           max-width: 800px;
@@ -357,14 +381,6 @@
           .album-item {
             background-color: black;
           }
-        }
-
-        .fullscreen-pic {
-          grid-column: span 3 / span 3;
-        }
-
-        .fullscreen-info {
-          grid-column: span 3 / span 3;
         }
       </style>
 </section>

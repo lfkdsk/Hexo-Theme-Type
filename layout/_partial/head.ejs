@@ -63,7 +63,7 @@
   <link rel="apple-touch-icon" sizes="114x114" href="<%= theme.apple_icon.iphone_hd %>" />
   <link rel="apple-touch-icon" sizes="144x144" href="<%= theme.apple_icon.ipad_hd %>" />
   <!-- 添加 RSS 订阅 -->
-  <link rel="alternate" type="application/rss+xml" title="<%= config.title %>" href="/atom.xml" />
+  <link rel="alternate" type="application/rss+xml" title="<%= config.title %>" href="/rss" />
   <!-- uc强制竖屏 -->
   <meta name="screen-orientation" content="portrait">
   <!-- QQ强制竖屏 -->
@@ -78,6 +78,7 @@
   <meta name="x5-page-mode" content="app">
   <!-- https://material.io/resources/icons/?style=outline -->
   <% if (theme.nav_style =='icon' ){ %>
+  <%- console.log(theme.nav_style_src) %>
   <script src="<%= theme.nav_style_src %>"></script>
   <% } %>
   <%- partial('_partial/fonts') %>
