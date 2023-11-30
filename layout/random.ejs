@@ -1,7 +1,7 @@
 <script src="js/html2canvas.js"></script>
 <section class="pjax-area">
     <%- include('_partial/single-photo.ejs') %>
-        <script>
+        <script type="module">
             $("#tools-wrapper").show();
             var imageBox = document.getElementById("imgbox"); // imageBox 是放置大图片的图框
             var descBox = $("#descbox");
@@ -17,7 +17,9 @@
             var normalWrapper = $("#normal-wrapper");
             var normalData = $("#no-exif-data");
             var download = $("#downloadbox");
-            const all = JSON.parse(`<%- JSON.stringify(site.data.photos) %>`);
+            // const all = JSON.parse(`<%- JSON.stringify(site.data.photos) %>`);
+            const response = await fetch('photos.json');
+            const all = await response.json();
             const keys = Object.keys(all);
             const max = keys.length;
             var value = null;
@@ -53,7 +55,7 @@
             }
             function copyLink() {
                 if (value !== null) {
-                    copyToClipboard('<%- config.url %>/photo?name=' + value.path);
+                    copyToClipboard(window.location.origin + '<%- config.root %>photo?name=' + value.path);
                 }
             }
             nextBox.click(nextImage);
