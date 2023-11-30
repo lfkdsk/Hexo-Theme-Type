@@ -31,6 +31,10 @@ exifdata.maker = 'FUJIFILM' ORDER BY RANDOM() LIMIT 5;`);
         const SQL = await initSqlJs({
             locateFile: file => `<%- config.root %>js/sql-wasm.wasm`
         });
+        const sqlph = getParam('sql');
+        if (sqlph !== null && sqlph != "") {
+            editor.setValue(`/* tables(album, photo, location, exifdata) */\n` + sqlph.replace(/^"|"$/g, '').trim());
+        }
         // Create a database
         const sqlite = await fetch('sqlite.db');
         const sqlite_buf = await sqlite.arrayBuffer();
