@@ -4,7 +4,9 @@
             <div class="pic-item" />
             <img id="imgbox" class="pic-box" />
         </div>
-        <%- include('exif.ejs') %>
+        <div id="wrapper">
+            <%- include('exif.ejs') %>
+        </div>
     </div>
     <div id="tools-wrapper" class="album-info fullscreen-info" hidden>
         <p id="descbox" class="text-center text-xs hint-text"> </p>
@@ -53,6 +55,10 @@
     #exif-author {
         font-weight: lighter;
         color: gray;
+    }
+
+    #wrapper {
+        display: none;
     }
 
     .pic-wrapper {

@@ -1,7 +1,7 @@
 <script src="js/html2canvas.js"></script>
 <section class="pjax-area">
     <%- include('_partial/single-photo.ejs') %>
-        <script>
+        <script type="module">
             var imageBox = document.getElementById("imgbox"); // imageBox 是放置大图片的图框
             var descBox = $("#descbox");
             var descBox = $("#descbox");
@@ -33,13 +33,14 @@
                     simulateDownloadImageClick(canvas.toDataURL('image/png'),  name + '.png');
                 });
             });
+            const response = await fetch('photos.json');
+            const all = await response.json();
             function searchPhoto() {
                 if (name === "" || name == null) {
                     return;
                 }
-
                 imageBox.src = imgLink; //替换图片
-                var all = JSON.parse(`<%- JSON.stringify(site.data.photos) %>`);
+                addBackUp(imageBox,"<%- config.backup_base_url %>/", name);
                 for (const key of Object.keys(all)) {
                     var v = all[key];
                     if (v.path !== name || v.exif_data.length === 0) {
@@ -52,6 +53,7 @@
                     if (fancyBoxImage !== undefined) {
                         fancyBoxImage.src = imgLink;
                     }
+                    $("#wrapper").show();
                     if (v.exif === "" || v.exif_data.length === 0) {
                         wrapper.hide();
                         normalWrapper.show();

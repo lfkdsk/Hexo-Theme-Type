@@ -19,9 +19,13 @@
 <% if(theme.cdn.use == 'jsdelivr') { %>
 <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/highlight.min.js" defer></script>
 <% } else if ( theme.cdn.use == 'self_host') { %>
-<script src="<%- url_for('/js/highlight.min.js') %>" async></script>
+<script src="<%- url_for('/js/highlight.min.js') %>"></script>
+<script src="<%- url_for('/js/highlightjs-line-numbers.min.js') %>"></script>
 <% } %>
-<script>window.addEventListener('load', () => hljs.initHighlighting());</script>
+<!-- <script>window.addEventListener('load', () => {
+  hljs.highlightAll(); // initialize highlighting
+  hljs.initLineNumbersOnLoad(); // apply line numbering 
+});</script> -->
 <script>
   $("pre.code").each(function() {
     $(this).html("<ol><li>" + $(this).html().replace(/\n/g, "\n</li><li>") + "\n</li></ol>");

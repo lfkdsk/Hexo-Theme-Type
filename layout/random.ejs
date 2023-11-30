@@ -17,9 +17,10 @@
             var normalWrapper = $("#normal-wrapper");
             var normalData = $("#no-exif-data");
             var download = $("#downloadbox");
-            // const all = JSON.parse(`<%- JSON.stringify(site.data.photos) %>`);
+            console.time('json')
             const response = await fetch('photos.json');
             const all = await response.json();
+            console.timeEnd('json')
             const keys = Object.keys(all);
             const max = keys.length;
             var value = null;
@@ -35,6 +36,7 @@
                 var imgLink = '<%- config.base_url %>' + '/' + v.path;
                 imageBox.src = '';
                 imageBox.src = imgLink;
+                addBackUp(imageBox,"<%- config.backup_base_url %>/", v.path);
                 var imageFancy = imageBox.parentElement;
                 imageFancy.setAttribute("href", imgLink);
                 var fancyBoxImage = document.getElementsByClassName("fancybox__image")[0];
@@ -42,6 +44,7 @@
                     fancyBoxImage.src = imgLink;
                 }
                 name = v.name;
+                $("#wrapper").show();
                 if (v.exif === "" || v.exif_data.length === 0) {
                     wrapper.hide();
                     normalWrapper.show();
