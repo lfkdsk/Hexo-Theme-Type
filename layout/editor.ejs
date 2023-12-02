@@ -1,0 +1,37 @@
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
+<script
+    src="https://scaleflex.cloudimg.io/v7/plugins/filerobot-image-editor/latest/filerobot-image-editor.min.js?func=proxy"></script>
+<section class="pjax-area">
+    <div id="image-editor" style="height: 100vh; width: 100%;"></div>
+    <script>
+        const container = document.getElementById("image-editor");
+        const { TABS, TOOLS } = FilerobotImageEditor;
+        const file = getParam('file');
+        const config = {
+            source: file,
+            defaultTabId: TABS.FILTERS,
+        };
+        console.log(TABS.FILTERS)
+        const ImageEditor = new window.FilerobotImageEditor(container, config);
+        ImageEditor.render({
+            // additional config provided while rendering
+            observePluginContainerSize: true,
+            onSave: (imageInfo, designState) => {
+                const tmpLink = document.createElement("a");
+                tmpLink.download = imageInfo.fullName;
+                tmpLink.href = imageInfo.imageBase64;
+                tmpLink.style = "position: absolute; z-index: -111; visibility: none;";
+                document.body.appendChild(tmpLink);
+                tmpLink.click();
+                document.body.removeChild(tmpLink);
+            }
+        });
+    </script>
+    <style>
+        @media (min-width: 769px) {
+            #image-editor {
+                padding-top: 58px;
+            }
+        }
+    </style>
+</section>
