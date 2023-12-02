@@ -1,15 +1,101 @@
-<%
-    var title = '';
-    if (page.category) title = page.category;
-    if (page.tag) title = "#" + page.tag;
-    if (page.archive) {
-        if (page.year) title = page.year + (page.month ? '/' + page.month : '');
-        else title = __('archive_a');
+<script src="js/sql-wasm.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+  integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+<section class="pjax-area">
+  <div id="wrapper"></div>
+  <div id="result" class="container gpro-container grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+  </div>
+
+  <script type="module">
+    const initSqlJs = window.initSqlJs;
+
+    const SQL = await initSqlJs({
+      locateFile: file => `<%- config.root %>js/sql-wasm.wasm`
+    });
+    const q = `
+SELECT tag.name FROM tag;
+    `
+    const sqlite = await fetch('sqlite.db');
+    const sqlite_buf = await sqlite.arrayBuffer();
+    const db = new SQL.Database(new Uint8Array(sqlite_buf));
+    const data = db.exec(q);
+    const wrapper = document.getElementById("wrapper");
+    const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    function select(event) {
+      var tag = event.target.innerText;
+      var search = `
+SELECT photo.path FROM photo LEFT JOIN tag on 
+photo.tag_id = tag.id
+WHERE tag.name = "` + tag + "\"";
+      var result = db.exec(search);
+      console.log(result)
+      var res = document.getElementById("result");
+      res.innerHTML = "";
+      for (const item of result) {
+        for(const column of item.values) {
+          for (const imgpath of column) {
+            const ele = document.createElement("a");
+            // ele.href = "<%- url_for(path) %>"
+            const d = document.createElement("div");
+            d.classList = "gpro-tile lazy"
+            d.setAttribute("style", 'background-image: url("<%- config.thumbnail_url %>' + imgpath.substr(0, imgpath.lastIndexOf(".")) + '.webp")')
+            ele.appendChild(d);
+            res.appendChild(ele);
+          }
+        }
+      }
     }
-%>
-<div class="content-area archive-content-area p-4 container max-w-[1280px] pjax-area">
-  <div class="index-achieve-title title"><%- title %></div>
-  <section class="itp-blog-list">
-    <%- partial('_partial/archive-list') %>
-  </section>
-</div>
+    for (const item of data) {
+      for (const column of item.values) {
+        const ele = document.createElement('button');
+        ele.classList = 'btn ibtn'
+        if (isDarkMode) {
+          ele.classList.add("btn-light")
+        } else {
+          ele.classList.add("btn-dark")
+        }
+        ele.innerText = column;
+        ele.onclick = (e) => select(e);
+        wrapper.appendChild(ele);
+      }
+    }
+
+  </script>
+  <style>
+    .ibtn {
+      margin: 4px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 90%;
+    }
+
+    .gpro-tile {
+      aspect-ratio: 3 / 2;
+      background-position: center;
+      background-size: cover;
+      transition: all .15s ease-in-out;
+      min-height: 211px;
+    }
+
+    .gpro-tile:hover {
+      box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
+      transition: all .15s ease-in-out;
+    }
+
+    #result {
+      margin-top: 100px;
+      gap: 12px;
+    }
+
+    @media (min-width: 769px) {
+      #wrapper {
+        padding-top: 130px;
+      }
+    }
+  </style>
+</section>
