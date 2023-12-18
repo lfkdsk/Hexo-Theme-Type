@@ -38,7 +38,7 @@ SELECT country, COUNT(*) as count
 FROM location 
 GROUP BY country;
 
-SELECT EXIFData.focal_length as F_Number, COUNT(*) AS Count
+SELECT EXIFData.focal_length as FocalLength, COUNT(*) AS Count
 FROM Photo
 LEFT OUTER JOIN EXIFData ON Photo.exif_data_id = EXIFData.id
 WHERE Photo.exif_data_id IS NOT NULL OR Photo.exif <> ''
