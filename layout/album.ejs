@@ -56,7 +56,10 @@
           </div>
           <div class="album-share album-tool">
             <iconpark-icon name="save"></iconpark-icon><a id="editor" href="javascript:void(0)"> Editor </a>
-          </div>          
+          </div>     
+          <div class="album-share album-tool">
+            <iconpark-icon name="grid-nine"></iconpark-icon><a id="grid" href="javascript:void(0)"> Grid </a>
+          </div>        
         </div>        
         <div class="album-title"><%- page.title %></div>
         <span class="album-subtitle">
@@ -194,6 +197,9 @@
         $("#share").on('click', function() {
           var imageBox = document.getElementById("imgbox"); 
           copyToClipboard('<%- full_url_for() %>' + "photo?name=" + imageBox.getAttribute('share'));
+        });
+        $("#grid").on('click', function() {
+          window.open('<%- config.root %>grid?name=<%- page.url %>');
         });
       </script>
       <style>
