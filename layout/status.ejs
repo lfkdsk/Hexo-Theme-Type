@@ -26,14 +26,20 @@
         const start = performance.now();
         const params = [db, '<%- config.thumbnail_url %>', '<%- config.backup_thumbnail_url %>'];
         queryTable(
+            ['Total Count'],
+            `
+SELECT count(*) as count from photo;            
+`,
+            ...params,
+        );        
+        queryTable(
             ['Image Maker'],
             `
 SELECT IFNULL(EXIFData.maker, 'NONE') AS maker, COUNT(*) AS count
 FROM Photo
 LEFT OUTER JOIN EXIFData ON Photo.exif_data_id = EXIFData.id
 GROUP BY maker
-ORDER BY maker;
-`,
+ORDER BY maker;`,
             ...params,
         );
         queryTable(
