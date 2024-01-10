@@ -1,0 +1,142 @@
+<script src="js/sql-wasm.js"></script>
+
+<section class="pjax-area">
+    <div id="grid-all" class="content-area album-area"></div>
+    <script type="module">
+        const SQL = await initSqlJs({
+            locateFile: (file) => `<%- config.root %>js/sql-wasm.wasm`,
+        });
+        const sqlite = await fetch("sqlite.db");
+        const sqlite_buf = await sqlite.arrayBuffer();
+        const db = new SQL.Database(new Uint8Array(sqlite_buf));
+        const start = performance.now();
+        var gridAll = document.getElementById("grid-all");
+        var result = db.exec(
+            `
+SELECT
+    DATE(EXIFData.date) AS photo_date,
+    json_group_array(json_object('id', Photo.id, 'path', Photo.path, 'name', Photo.name)) AS photos
+FROM
+    Photo
+INNER JOIN
+    EXIFData ON Photo.exif_data_id = EXIFData.id
+GROUP BY
+    photo_date
+ORDER BY
+    photo_date DESC;
+`
+        );
+        console.log(result);
+        var values = result[0].values;
+        for (const key of Object.keys(values)) {
+            const v = values[key];
+            var grid = document.createElement("div");
+            var sec = document.createElement('h2');
+            sec.classList = 'date-sec'
+            var images = JSON.parse(v[1]);
+            grid.classList =
+                "container gpro-container grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4";
+            for (const image of images) {
+                var d = document.createElement("div");
+                d.classList = "gpro-tile lazy";
+                d.setAttribute("data-src", '<%- config.thumbnail_url %>' + image.path.replace(/\.\w+$/, '.webp'));
+                var a = document.createElement("a");
+                a.setAttribute("data-fancybox", "gallery");
+                a.href = '<%- config.base_url %>/' + image.path;
+                a.appendChild(d);
+                grid.appendChild(a);
+            }
+            sec.innerText = v[0];
+            gridAll.appendChild(sec);
+            gridAll.appendChild(grid);
+        }
+        $(function () {
+            $("div.lazy").lazyload();
+        });
+    </script>
+    <style>
+        body {
+            background-color: #fff;
+        }
+
+        .album-area {
+            margin-top: 120px;
+            padding-left: 45px;
+            padding-right: 45px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .gpro-slogan {
+            text-align: center;
+            font-size: 36px;
+            font-weight: 700;
+            color: #3d4350;
+        }
+
+        .date-sec {
+            width: 100%;
+            font-size: 1.5em;
+            text-align: end;
+            padding-top: 20px;
+        }
+
+        .gpro-container {
+            gap: 40px;
+            padding-top: 20px;
+        }
+
+        .gpro-tile {
+            aspect-ratio: 3 / 2;
+            background-position: center;
+            background-size: cover;
+            transition: all 0.15s ease-in-out;
+            min-height: 121px;
+        }
+
+        .gpro-tile:hover {
+            box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
+            transition: all 0.15s ease-in-out;
+        }
+
+        .gpro-tile-descr {
+            position: relative;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            color: #fff;
+            font-size: 14px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            align-items: center;
+            text-overflow: clip;
+            flex-direction: column;
+            transition: all 0.15s ease-in-out;
+            padding-bottom: 0.85em;
+            opacity: 0;
+            background-color: rgb(9, 9, 11);
+        }
+
+        .gpro-tile-descr:hover {
+            opacity: 0.8;
+            transition: all 0.15s ease-in-out;
+        }
+
+        @media (max-width: 768px) {
+            .gpro-tile-descr {
+                opacity: 0.6;
+            }
+
+            .gpro-slogan {
+                font-size: 28px;
+            }
+
+            .content-area {
+                margin-top: 80px;
+            }
+        }
+    </style>
+</section>
