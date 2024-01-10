@@ -24,10 +24,18 @@ GROUP BY
     photo_date
 ORDER BY
     photo_date DESC;
+SELECT
+    "#",
+    json_group_array(json_object('id', Photo.id, 'path', Photo.path, 'name', Photo.name)) AS photos
+FROM
+    Photo
+WHERE
+    Photo.exif_data_id is null;
 `
         );
-        console.log(result);
         var values = result[0].values;
+        values.push(...result[1].values);
+        console.log(values);
         for (const key of Object.keys(values)) {
             const v = values[key];
             var grid = document.createElement("div");
