@@ -13,11 +13,6 @@
         <% } %>
       </div>
     </div>
-    <script>
-      $(function() {
-        $("div.lazy").lazyload();
-      });
-    </script>
     <script type="module">
       var grid = document.getElementById("grid");
       var name = getParam('name');
@@ -37,6 +32,9 @@
         a.appendChild(d);
         grid.appendChild(a);
       }
+      $(function() {
+        $("div.lazy").lazyload();
+      });
     </script>
     <style>
       body {
