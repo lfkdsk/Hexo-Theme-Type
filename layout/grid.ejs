@@ -16,6 +16,7 @@
     <script type="module">
       var grid = document.getElementById("grid");
       var name = getParam('name');
+      const start = performance.now();
       const response = await fetch('photos.json');
       const all = await response.json();
       for (const key of Object.keys(all)) {
