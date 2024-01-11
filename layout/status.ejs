@@ -65,7 +65,7 @@ LIMIT 5;
         ...params,
         )
         // add heatmap into wrapper.
-        heatmap(db);
+        heatmap(db, '<%- config.root %>');
         const duration = performance.now() - start;
         console.log(duration + 'ms');
     </script>

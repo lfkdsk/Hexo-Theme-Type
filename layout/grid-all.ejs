@@ -10,6 +10,7 @@
         const sqlite_buf = await sqlite.arrayBuffer();
         const db = new SQL.Database(new Uint8Array(sqlite_buf));
         const start = performance.now();
+        const filter = getParam('filter');
         var gridAll = document.getElementById("grid-all");
         var result = db.exec(
             `
@@ -38,6 +39,9 @@ WHERE
         console.log(values);
         for (const key of Object.keys(values)) {
             const v = values[key];
+            if (filter !== null && filter !== v[0]) {
+                continue;
+            }
             var grid = document.createElement("div");
             var sec = document.createElement('h2');
             sec.classList = 'date-sec'
