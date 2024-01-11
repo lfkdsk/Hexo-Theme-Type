@@ -165,7 +165,7 @@
           });
         });   
         editor.click(function () {
-          window.open('<%- config.root %>editor?file=' + imgLink);
+          window.open('<%- config.root %>editor?file=' + encodeURIComponent(imgLink));
         })     
         // key
         window.onkeydown = function album_hotkey() {
@@ -199,7 +199,7 @@
           copyToClipboard('<%- full_url_for() %>' + "photo?name=" + imageBox.getAttribute('share'));
         });
         $("#grid").on('click', function() {
-          window.open('<%- config.root %>grid?name=<%- page.url %>');
+          window.open('<%- config.root %>grid?name=' + encodeURIComponent('<%- page.url %>'));
         });
       </script>
       <style>
