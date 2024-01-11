@@ -35,8 +35,6 @@
                     simulateDownloadImageClick(canvas.toDataURL('image/png'), name + '.png');
                 });
             });
-            // const response = await fetch('photos.json');
-            // const all = await response.json();
             const SQL = await initSqlJs({
                 locateFile: (file) => `<%- config.root %>js/sql-wasm.wasm`,
             });
