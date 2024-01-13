@@ -39,7 +39,7 @@ WHERE album.dir = '` + name + "'"
       d.setAttribute('data-src', '<%- config.thumbnail_url %>' + v[0].replace(/\.\w+$/, '.webp'));
       var a = document.createElement('a');
       a.setAttribute('data-fancybox', 'gallery');
-      a.href = '<%- config.thumbnail_url %>' + v[0];
+      a.href = '<%- config.base_url %>/' + v[0];
       a.appendChild(d);
       grid.appendChild(a);
       if (setTitle) {
