@@ -10,8 +10,8 @@
                 <div class="gpro-tile lazy" data-src="<%- thum %>">
                 </div>
               </a>
-              <% } %>
-                <% } %>
+         <% } %>
+     <% } %>
     </div>
   </div>
   <script type="module">
@@ -26,12 +26,13 @@
     const db = new SQL.Database(new Uint8Array(sqlite_buf));
     const result = db.exec(
 `
-SELECT photo.path
+SELECT photo.path, album.dir
 FROM photo
 LEFT OUTER JOIN album
 ON photo.dir_id = album.id
 WHERE album.dir = '` + name + "'"
     )[0].values;
+    var setTitle = true;
     for (const v of result) {
       var d = document.createElement('div');
       d.classList = 'gpro-tile lazy';
@@ -41,6 +42,10 @@ WHERE album.dir = '` + name + "'"
       a.href = '<%- config.thumbnail_url %>' + v[0];
       a.appendChild(d);
       grid.appendChild(a);
+      if (setTitle) {
+        setTitle = false;
+        document.title = v[1] + ' ' + document.title; 
+      }
     }
     $(function () {
       $("div.lazy").lazyload();
@@ -121,11 +126,11 @@ WHERE album.dir = '` + name + "'"
       }
 
       .content-area {
-        margin-top: 80px;
+        margin-top: 0px;
       }
 
       .gpro-container {
-        margin-top: 60px;
+        margin-top: 40px;
       }
     }
   </style>
