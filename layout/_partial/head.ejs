@@ -101,7 +101,7 @@
     crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-    crossorigin=""></script>    
+    crossorigin=""></script>
   <% } %>
   <% if (page.layout =='gallery2' ){ %>
   <%- css(('css/gallery2')) %>
@@ -120,6 +120,11 @@
   <%- css(url_for('css/highlight/tomorrow-night-eighties')) %>
   <% } %>
   <% } %>
+
+  <% if (config.custom_css) { %>
+    <link rel="stylesheet" href="<%= url_for(config.custom_css) %>">
+  <% } %>
+
   <!-- jquery -->
   <% if(theme.cdn.use == 'jsdelivr') { %>
   <script src="//cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
