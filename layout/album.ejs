@@ -199,7 +199,7 @@
           copyToClipboard('<%- full_url_for() %>' + "photo?name=" + imageBox.getAttribute('share'));
         });
         $("#grid").on('click', function() {
-          window.open('<%- config.root %>grid?name=' + encodeURIComponent('<%- page.url %>'));
+          window.open('<%- config.root %>grid-all?album=' + encodeURIComponent('<%- page.url %>'));
         });
       </script>
       <style>
