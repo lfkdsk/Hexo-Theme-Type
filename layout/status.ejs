@@ -75,7 +75,20 @@ ORDER BY COUNT(*) DESC
 LIMIT 5;
 `,
         ...params,
-        )
+        );
+        queryTable(
+            ['Group by exposure time and order by count.'],
+`
+SELECT EXIFData.exposure_time as ExposureTime, COUNT(*) AS Count
+FROM Photo
+LEFT OUTER JOIN EXIFData ON Photo.exif_data_id = EXIFData.id
+WHERE Photo.exif_data_id IS NOT NULL OR Photo.exif <> ''
+GROUP BY EXIFData.exposure_time
+ORDER BY COUNT(*) DESC;
+LIMIT 5;
+`,
+        ...params,
+        );        
         // add heatmap into wrapper.
         heatmap(db, '<%- config.root %>');
         const duration = performance.now() - start;
