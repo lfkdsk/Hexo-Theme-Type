@@ -1,7 +1,12 @@
-<rss version="2.0">
+<rss xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0">
     <channel>
         <title><%= config.title %></title>
         <link><%= config.url %></link>
+        <follow_challenge>
+            <feedId><%= config.follow_challenge.feedId %></feedId>
+            <userId><%= config.follow_challenge.userId %></userId>
+        </follow_challenge>        
+        <description><%= config.description %></description>
         <% const albums = site.pages.filter(i => i.layout === 'album') %>
         <% 
         albums.sort(function(a,b){
@@ -10,11 +15,6 @@
             return new Date(b.date) - new Date(a.date);
           });
         %>
-        <description><%= config.description %></description>
-        <follow_challenge>
-            <feedId><%= config.follow_challenge.feedId %></feedId>
-            <userId><%= config.follow_challenge.userId %></userId>
-        </follow_challenge>
         <language><%= config.language %></language>
         <updated><%= albums.first().date.toISOString() %></updated>
         <% for (var post of albums.data) { %>
