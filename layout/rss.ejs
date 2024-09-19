@@ -1,4 +1,3 @@
-<?xml version="1.0"?>
 <rss version="2.0">
     <channel>
         <title><%= config.title %></title>
@@ -12,6 +11,10 @@
           });
         %>
         <description><%= config.description %></description>
+        <follow_challenge>
+            <feedId><%= config.follow_challenge.feedId %></feedId>
+            <userId><%= config.follow_challenge.userId %></userId>
+        </follow_challenge>
         <language><%= config.language %></language>
         <updated><%= albums.first().date.toISOString() %></updated>
         <% for (var post of albums.data) { %>
@@ -22,7 +25,9 @@
             <link><%- config.url %>/<%- post.url %></link>
             <pubDate><%= post.date.utc().format('ddd, DD MMM YYYY HH:mm:ss') %></pubDate>     
             <updated><%= post.date.utc().format('ddd, DD MMM YYYY HH:mm:ss')%></updated>
-            <description type="html"> <%- post.rss.join(' ') %> </description>
+            <description type="html">
+                <%- post.rss.join('\n') %>
+            </description>
         </item>
         <%_ } _%>
     </channel>
