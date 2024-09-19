@@ -22,7 +22,7 @@
             <link><%- config.url %>/<%- post.url %></link>
             <pubDate><%= post.date.utc().format('ddd, DD MMM YYYY HH:mm:ss') %></pubDate>     
             <updated><%= post.date.utc().format('ddd, DD MMM YYYY HH:mm:ss')%></updated>
-            <description type="html"> "<%- post.rss.join(' ') %>" </description>
+            <description type="html"> <%- post.rss.join(' ') %> </description>
         </item>
         <%_ } _%>
     </channel>
