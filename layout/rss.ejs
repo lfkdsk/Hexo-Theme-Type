@@ -26,7 +26,9 @@
             <pubDate><%= post.date.utc().format('ddd, DD MMM YYYY HH:mm:ss') %></pubDate>     
             <updated><%= post.date.utc().format('ddd, DD MMM YYYY HH:mm:ss')%></updated>
             <description type="html">
-                <%- post.rss.join('\n') %>
+                <![CDATA[ 
+                <%- post.rss.join(' ') %>
+                ]]>
             </description>
         </item>
         <%_ } _%>
