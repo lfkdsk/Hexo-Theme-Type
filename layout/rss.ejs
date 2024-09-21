@@ -8,6 +8,7 @@
             <userId><%= config.follow_challenge.userId %></userId>
         </follow_challenge>
         <% } %>
+        <lastBuildDate><%= new Date().toGMTString() %></lastBuildDate>
         <description><%= config.description %></description>
         <% const albums = site.pages.filter(i => i.layout === 'album') %>
         <%
