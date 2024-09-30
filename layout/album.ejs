@@ -16,7 +16,6 @@
           <% var url = p.url; %>
           <% var name = p.name; %>
           <% var thum = p.thum; %>
-          <% var desc = p.desc; %>
           <% var share = p.share; %>
           <%
           function searchPhoto(data, url) {
@@ -29,6 +28,7 @@
           }          
           %>
           <% var extra = searchPhoto(site.data.photos, share) %>
+          <% var desc = extra.desc %>
           <a class="album-item lazy" id="<%- i %>"
             name="<%- name %>" rel="<%- url %>"
             desc=" <%- desc %> "
@@ -129,7 +129,8 @@
             fancyBoxImage.src = imgLink;
           }
           target.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })
-          descBox.text(desc);
+          descBox.text(imgno.desc);
+          imageBox.title = desc;
           changeExifData(v);
           updateParams(name);
         }
