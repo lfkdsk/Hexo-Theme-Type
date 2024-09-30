@@ -40,7 +40,7 @@ SELECT IFNULL(EXIFData.maker, 'NONE') AS maker, COUNT(*) AS count
 FROM Photo
 LEFT OUTER JOIN EXIFData ON Photo.exif_data_id = EXIFData.id
 GROUP BY maker
-ORDER BY COUNT(*) DESC;
+ORDER BY count DESC;
 `,
             ...params,
         );
