@@ -27,11 +27,13 @@
             return {}
           }          
           %>
-          <% var extra = searchPhoto(site.data.photos, share) %>
-          <% var desc = extra.desc %>
+          <% var extra0 = searchPhoto(site.data.photos, share) %>
+          <% var desc = extra0.desc %>
+          <% var extra = JSON.parse(JSON.stringify(extra0)); %>
+          <% extra.desc = null %>
           <a class="album-item lazy" id="<%- i %>"
             name="<%- name %>" rel="<%- url %>"
-            desc=" <%- desc %> "
+            desc="<%- desc %>"
             share="<%- share %>"
             extra='<%- JSON.stringify(extra) %>'
             href="javascript:void(0);" onClick="changeimg(event)" data-src="<%- thum %>"
@@ -114,7 +116,7 @@
           }
         }
         function changeImageWith(target) {
-          imgno = target.getAttribute('id'); 
+          imgno = target.getAttribute('id');
           imgLink = target.getAttribute('rel');
           name = target.getAttribute('name');
           var desc = target.getAttribute('desc');
@@ -150,10 +152,12 @@
         } else {
           var value = $(`#0`)[0];
           name = value.getAttribute('name');
+          imageBox.title = value.getAttribute('desc');
           var v = JSON.parse(value.getAttribute('extra'));
           changeExifData(v);
           imageBox.setAttribute("share", value.getAttribute('share'));
         }
+
         $('#download').click(function () {
           var node = document.getElementById('all-pic');
           html2canvas(node, {
