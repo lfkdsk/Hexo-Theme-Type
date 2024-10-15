@@ -123,8 +123,8 @@
           var desc = target.getAttribute('desc');
           var thum = target.getAttribute('data-src');
           var v = JSON.parse(target.getAttribute('extra'));
-          imageBox.classList.add('blur');
           imageBox.src = thum;
+          imageBox.classList.add('blur');
           // load the original img.
           const highResImage = new Image();
           highResImage.src = imgLink;
