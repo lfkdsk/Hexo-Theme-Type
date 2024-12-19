@@ -25,7 +25,7 @@
         const sqlite_buf = await sqlite.arrayBuffer();
         const db = new SQL.Database(new Uint8Array(sqlite_buf));
         const start = performance.now();
-        const params = [db, '<%- config.thumbnail_url %>', '<%- config.backup_thumbnail_url %>'];
+        const params = [null, db, '<%- config.thumbnail_url %>', '<%- config.backup_thumbnail_url %>'];
         queryTable(
             ['Total Count'],
             `
@@ -42,7 +42,15 @@ LEFT OUTER JOIN EXIFData ON Photo.exif_data_id = EXIFData.id
 GROUP BY maker
 ORDER BY count DESC;
 `,
-            ...params,
+            ...[function resolve(td, cell, index) {
+                if (index !== 0) {
+                    return document.createTextNode(cell);
+                }
+                const a = document.createElement('a');
+                a.text = cell;
+                a.setAttribute('href', 'grid-all?maker=' + cell);
+                return a;
+            }, ...params.slice(1)],
         );
         queryTable(
             ['Image Lens Maker'],

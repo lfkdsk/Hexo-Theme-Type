@@ -13,6 +13,7 @@
         const start = performance.now();
         const album = getParam('album');
         var filter = getParam('filter');
+        const maker = getParam('maker');
         var loadAll = getParam('all') !== null;
         var page = 1;
         var pageSize = 5;
@@ -50,6 +51,8 @@ FROM
 LEFT JOIN
     EXIFData ON Photo.exif_data_id = EXIFData.id` 
     + (album !== null ? ' WHERE Photo.dir_id = (SELECT Album.id FROM Album WHERE Album.dir = "' + album + '")' : ' ')                
+    + ((maker !== null && maker !== "NONE") ? ' WHERE EXIFData.maker = "' + maker + '"' : ' ')                
+    + ((maker !== null && maker === "NONE") ? ' WHERE EXIFData.maker IS NULL ': '')                
     +
 `GROUP BY
     photo_date

@@ -261,7 +261,7 @@ function isImage(filename) {
   return ['jpg', 'jpeg', 'gif', 'png', 'bmp', 'svg', 'webp'].includes(ext);
 }
 
-function fillTable(data, name, thumbnail_url, backup_thumbnail_url) {
+function fillTable(data, name, callback, thumbnail_url, backup_thumbnail_url) {
   const wrapper = document.getElementById('table-wrapper');
   var i = 0;
   for (const item of data) {
@@ -291,6 +291,7 @@ function fillTable(data, name, thumbnail_url, backup_thumbnail_url) {
     const tbody = table.createTBody();
     for (const row of item.values) {
         const tr = tbody.insertRow();
+        var index = 0
         for (const cell of row) {
             const td = tr.insertCell();
             if (isImage(cell + "")) {
@@ -305,14 +306,15 @@ function fillTable(data, name, thumbnail_url, backup_thumbnail_url) {
                 td.appendChild(img)
                 continue
             }
-            const text = document.createTextNode(cell);
-            td.appendChild(text);
+            const result = callback !== null ? callback(td, cell, index) : document.createTextNode(cell);
+            td.appendChild(result);
+            index++;
         }
     }
   }
 }
 
-function queryTable(name, sql, db, thumbnail_url, backup_thumbnail_url) {
+function queryTable(name, sql, callback, db, thumbnail_url, backup_thumbnail_url) {
   var data = db.exec(sql);
-  fillTable(data, name, thumbnail_url, backup_thumbnail_url);
+  fillTable(data, name, callback, thumbnail_url, backup_thumbnail_url);
 }
