@@ -61,7 +61,15 @@ group by lens_model
 order by lens_count DESC
 limit 10;
 `,
-            ...params,
+        ...[function resolve(td, cell, index) {
+                if (index !== 0) {
+                    return document.createTextNode(cell);
+                }
+                const a = document.createElement('a');
+                a.text = cell;
+                a.setAttribute('href', 'grid-all?lens_model=' + cell);
+                return a;
+            }, ...params.slice(1)],
         );        
         queryTable(
             ['Location'],
@@ -71,7 +79,15 @@ FROM location
 GROUP BY country
 ORDER BY COUNT(*) DESC;
 `,
-        ...params,       
+        ...[function resolve(td, cell, index) {
+                if (index !== 0) {
+                    return document.createTextNode(cell);
+                }
+                const a = document.createElement('a');
+                a.text = cell;
+                a.setAttribute('href', 'grid-all?country=' + cell);
+                return a;
+            }, ...params.slice(1)],
         );
         queryTable(
             ['Group by focal length and order by count.'],
@@ -84,8 +100,15 @@ GROUP BY EXIFData.focal_length
 ORDER BY COUNT(*) DESC
 LIMIT 5;
 `,
-        ...params,
-        );
+            ...[function resolve(td, cell, index) {
+                if (index !== 0) {
+                    return document.createTextNode(cell);
+                }
+                const a = document.createElement('a');
+                a.text = cell;
+                a.setAttribute('href', 'grid-all?focal_length=' + cell);
+                return a;
+            }, ...params.slice(1)],        );
         queryTable(
             ['Group by exposure time and order by count.'],
 `
