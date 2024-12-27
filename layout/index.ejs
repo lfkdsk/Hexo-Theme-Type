@@ -1,42 +1,50 @@
-<section class="pjax-area">  
+<section class="pjax-area">
   <div class="content-area album-area">
-    <% if (theme.photography_page.slogan == true) { %>
-    <div class="container gpro-slogan title">
-      <% if (config.photography_page.slogan == true) { %>
-        <%- config.photography_page.slogan_descr %>
-      <% } else { %>
-        <%- theme.photography_page.slogan_descr %>
-      <% } %>
-    </div>
-    <% } %>
-    <div class="container gpro-container grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-      <% if (site.data.album) { %>
-      <% for (var a in site.data.album) { %>
-        <% var hidden = site.data.album[a].hidden %>
-        <% if (!hidden) { %>
-          <a href="<%- url_for(site.data.album[a].url) %>">
-            <% var file = site.data.album[a].cover %>
-            <% var cover = config.thumbnail_url + file.substr(0, file.lastIndexOf(".")) + ".webp" %>
-            <div class="gpro-tile lazy" data-src="<%- cover %>">
-              <div class="gpro-tile-descr flex-col">
-                <div class="text-xl font-medium"><%= a %></div>
-                <% var isEmpty = site.data.album[a].date === '' %>
-                <% if (!isEmpty) { %>
-                <div class="text-sm opacity-75"><%= moment(site.data.album[a].date).format(config.date_format) %></div>
-                <% } else { %>
-                <div class="text-sm opacity-75"><%= site.data.album[a].subtitle %></div>
+    <% if (theme.photography_page.slogan==true) { %>
+      <div class="container gpro-slogan title">
+        <% if (config.photography_page.slogan==true) { %>
+          <%- config.photography_page.slogan_descr %>
+            <% } else { %>
+              <%- theme.photography_page.slogan_descr %>
                 <% } %>
-              </div>  
-            </div>
-          </a>
-        <% } %>
+      </div>
       <% } %>
-      <% } %>
-    </div>
+        <div id="year-button"></div>
+        <div class="container gpro-container grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <% if (site.data.album) { %>
+            <% for (var a in site.data.album) { %>
+              <% var hidden=site.data.album[a].hidden %>
+                <% if (!hidden) { %>
+                  <a href="<%- url_for(site.data.album[a].url) %>">
+                    <% var file=site.data.album[a].cover %>
+                      <% var cover=config.thumbnail_url + file.substr(0, file.lastIndexOf(".")) + ".webp" %>
+                        <div class="gpro-tile lazy" data-src="<%- cover %>">
+                          <div class="gpro-tile-descr flex-col">
+                            <div class="text-xl font-medium">
+                              <%= a %>
+                            </div>
+                            <% var isEmpty=site.data.album[a].date==='' %>
+                              <% if (!isEmpty) { %>
+                                <div class="text-sm opacity-75">
+                                  <%= moment(site.data.album[a].date).format(config.date_format) %>
+                                </div>
+                                <% } else { %>
+                                  <div class="text-sm opacity-75">
+                                    <%= site.data.album[a].subtitle %>
+                                  </div>
+                                <% } %>
+                          </div>
+                        </div>
+                  </a>
+                <% } %>
+              <% } %>
+            <% } %>
+        </div>
   </div>
   <script>
-    $(function() {
+    $(function () {
       $("div.lazy").lazyload();
+      addYearEndSummaryLink(document.getElementById("year-button"), "<%- config.root %>")
     });
   </script>
   <style>
@@ -122,4 +130,3 @@
     }
   </style>
 </section>
-
