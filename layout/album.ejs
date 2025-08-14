@@ -6,7 +6,7 @@
       <div class="<%- page.style %>-pic gap-2 wrapper">
         <div id="all-pic" class="pic-area">
           <div id="pic-g" class="pic-item" />
-          <img id="imgbox" draggable="false" class="pic-box" src="<%- page.photos[0].url %>" />
+          <img id="imgbox" class="pic-box" src="<%- page.photos[0].url %>" />
         </div>
         <%- include('_partial/exif.ejs') %>
       </div>
@@ -426,5 +426,6 @@
             border: 0.8px solid white;
           }
         }
+
       </style>
 </section>
