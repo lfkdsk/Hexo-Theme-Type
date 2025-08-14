@@ -1,10 +1,11 @@
 <script src="js/html2canvas.js"></script>
+<script src="js/mini-live-photo.js"></script>
 <section class="pjax-area">
   <div class="content-area post-album <%- page.style %>-content-area">
     <div class="grid grid-cols-3">
       <div class="<%- page.style %>-pic gap-2 wrapper">
         <div id="all-pic" class="pic-area">
-          <div class="pic-item" />
+          <div id="pic-g" class="pic-item" />
           <img id="imgbox" class="pic-box" src="<%- page.photos[0].url %>" />
         </div>
         <%- include('_partial/exif.ejs') %>
@@ -17,6 +18,7 @@
           <% var name = p.name; %>
           <% var thum = p.thum; %>
           <% var share = p.share; %>
+          <% var video = p.video; %>
           <%
           function searchPhoto(data, url) {
             for (var key in data) {
@@ -35,6 +37,7 @@
             name="<%- name %>" rel="<%- url %>"
             desc="<%- desc %>"
             share="<%- share %>"
+            video="<%- video %>"
             extra='<%- JSON.stringify(extra) %>'
             href="javascript:void(0);" onClick="changeimg(event)" data-src="<%- thum %>"
             aria-label="the photo <%- i %>"></a>
@@ -122,6 +125,7 @@
           name = target.getAttribute('name');
           var desc = target.getAttribute('desc');
           var thum = target.getAttribute('data-src');
+          var video = target.getAttribute('video');
           var v = JSON.parse(target.getAttribute('extra'));
           imageBox.src = thum;
           imageBox.classList.add('blur');
@@ -135,6 +139,9 @@
           imageBox.setAttribute("share", target.getAttribute('share'));
           var imageFancy = imageBox.parentElement; // imageBox 是放置大图片的图框
           imageFancy.setAttribute("href", imgLink);
+
+          var picg = document.getElementById('pic-g');
+          attachLivePhoto(picg, video !== '', video);
           var fancyBoxImage = document.getElementsByClassName("fancybox__image")[0];
           if (fancyBoxImage !== undefined) {
             fancyBoxImage.src = imgLink;
