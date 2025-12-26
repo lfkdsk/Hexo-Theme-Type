@@ -1,0 +1,366 @@
+<script src="js/sql-wasm.js"></script>
+
+<section class="pjax-area">
+    <div id="grid-all" class="content-area album-area">
+        <div id="floating-date" class="floating-date"></div>
+        <div id="masonry" class="gpro-masonry grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"></div>
+    </div>
+    <div id="sentinel" style="height: 1px; opacity: 0;"></div>
+    <script type="module">
+        const SQL = await initSqlJs({
+            locateFile: (file) => `<%- config.root %>js/sql-wasm.wasm`,
+        });
+        const sqlite = await fetch("sqlite.db");
+        const sqlite_buf = await sqlite.arrayBuffer();
+        const db = new SQL.Database(new Uint8Array(sqlite_buf));
+        const start = performance.now();
+        const album = getParam('album');
+        var filter = getParam('filter');
+        const maker = getParam('maker');
+        const lens_model = getParam('lens_model');
+        const country = getParam('country');
+        const focal_length = getParam('focal_length');
+        var loadAll = getParam('all') !== null;
+        var page = 1;
+        var pageSize = 40;
+        var historyToday = false;
+        const sentinel = document.getElementById("sentinel");
+        const masonry = document.getElementById("masonry");
+        const floatingDate = document.getElementById("floating-date");
+        const PLACEHOLDER_IMG = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+        let hasMore = true;
+        let isFetching = false;
+        let floatingDateRaf = 0;
+        const visibleItems = new Set();
+        if (filter !== null) {
+            loadAll = true;
+        }
+        if (filter === "historytoday") {
+            historyToday = true;
+            filter = new Date().toISOString().split('T')[0];
+        }
+        function sqlString(value) {
+            return "'" + String(value).replace(/'/g, "''") + "'";
+        }
+        function scheduleFloatingDateUpdate() {
+            if (floatingDateRaf) return;
+            floatingDateRaf = requestAnimationFrame(updateFloatingDate);
+        }
+        function updateFloatingDate() {
+            floatingDateRaf = 0;
+            if (!visibleItems.size) return;
+            let best = null;
+            let bestTop = Infinity;
+            for (const el of visibleItems) {
+                const top = el.getBoundingClientRect().top;
+                if (top >= -20 && top < bestTop) {
+                    bestTop = top;
+                    best = el;
+                }
+            }
+            if (!best) {
+                let maxTop = -Infinity;
+                for (const el of visibleItems) {
+                    const top = el.getBoundingClientRect().top;
+                    if (top > maxTop) {
+                        maxTop = top;
+                        best = el;
+                    }
+                }
+            }
+            const date = best?.getAttribute("data-date");
+            if (!date) return;
+            floatingDate.textContent = date === "###" ? "Unknown" : date;
+            if (!floatingDate.classList.contains("show")) {
+                floatingDate.classList.add("show");
+            }
+        }
+        const itemObserver = new IntersectionObserver(
+            (entries) => {
+                for (const entry of entries) {
+                    if (entry.isIntersecting) {
+                        visibleItems.add(entry.target);
+                    } else {
+                        visibleItems.delete(entry.target);
+                    }
+                }
+                scheduleFloatingDateUpdate();
+            },
+            { root: null, threshold: 0 }
+        );
+
+        const DEFAULT_ASPECT_RATIO = 2 / 3;
+
+        function getMasonryMetrics() {
+            const styles = getComputedStyle(masonry);
+            const rowHeight = parseFloat(styles.getPropertyValue("grid-auto-rows")) || 1;
+            const rowGap = parseFloat(styles.getPropertyValue("gap")) || 0;
+            return { rowHeight, rowGap };
+        }
+
+        function calcSpan(height, rowHeight, rowGap) {
+            return Math.max(1, Math.ceil((height + rowGap) / (rowHeight + rowGap)));
+        }
+
+        function getItemAspectRatio(item) {
+            const img = item.querySelector("img");
+            if (img && img.naturalWidth > 0 && img.naturalHeight > 0) {
+                return img.naturalHeight / img.naturalWidth;
+            }
+            return DEFAULT_ASPECT_RATIO;
+        }
+
+        function resizeMasonryItem(item) {
+            const { rowHeight, rowGap } = getMasonryMetrics();
+            const width = item.getBoundingClientRect().width;
+            if (!width) return;
+            const ratio = getItemAspectRatio(item);
+            const height = width * ratio;
+            item.style.gridRowEnd = `span ${calcSpan(height, rowHeight, rowGap)}`;
+        }
+
+        function resizeAllMasonryItems() {
+            for (const item of masonry.querySelectorAll(".gpro-item")) {
+                resizeMasonryItem(item);
+            }
+            scheduleFloatingDateUpdate();
+        }
+
+        function createPhotoItem(photo) {
+            const item = document.createElement("div");
+            item.className = "gpro-item";
+            item.setAttribute("data-date", photo.date);
+            item.style.gridRowEnd = `span ${calcSpan(240, getMasonryMetrics().rowHeight, getMasonryMetrics().rowGap)}`;
+
+            const a = document.createElement("a");
+            a.setAttribute("data-fancybox", "gallery");
+            a.href = '<%- config.base_url %>/' + photo.path;
+
+            const img = document.createElement("img");
+            img.className = "gpro-img lazy";
+            img.alt = photo.name || "";
+            img.src = PLACEHOLDER_IMG;
+            img.setAttribute(
+                "data-src",
+                '<%- config.thumbnail_url %>' + photo.path.replace(/\.\w+$/, ".webp")
+            );
+            img.addEventListener("load", () => {
+                resizeMasonryItem(item);
+                scheduleFloatingDateUpdate();
+            });
+
+            a.appendChild(img);
+            item.appendChild(a);
+            itemObserver.observe(item);
+            return { item, img };
+        }
+
+        function buildPhotoQuery() {
+            const whereParts = [];
+            if (album !== null) {
+                whereParts.push(
+                    `Photo.dir_id = (SELECT Album.id FROM Album WHERE Album.dir = ${sqlString(album)})`
+                );
+            }
+            if (maker !== null && maker !== "NONE") {
+                whereParts.push(`EXIFData.maker = ${sqlString(maker)}`);
+            }
+            if (maker !== null && maker === "NONE") {
+                whereParts.push("EXIFData.maker IS NULL");
+            }
+            if (lens_model !== null) {
+                whereParts.push(`EXIFData.lens_model = ${sqlString(lens_model)}`);
+            }
+            if (focal_length !== null) {
+                whereParts.push(`EXIFData.focal_length = ${sqlString(focal_length)}`);
+            }
+            if (country !== null && country !== "NONE") {
+                whereParts.push(`Location.country = ${sqlString(country)}`);
+            }
+            if (country !== null && country === "NONE") {
+                whereParts.push("Location.country = ''");
+            }
+            if (filter !== null && !historyToday) {
+                whereParts.push(`DATE(EXIFData.date) = ${sqlString(filter)}`);
+            }
+            if (filter !== null && historyToday) {
+                const md = String(filter).substring(5);
+                whereParts.push(`substr(DATE(EXIFData.date), 6, 5) = ${sqlString(md)}`);
+            }
+            const whereClause = whereParts.length ? " WHERE " + whereParts.join(" AND ") : "";
+            const orderDir = album !== null ? "ASC" : "DESC";
+            const joinLocation = country !== null ? " LEFT JOIN Location ON Photo.location_id = Location.id" : "";
+            const limitClause = loadAll
+                ? ";"
+                : ` LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize};`;
+
+            return (
+                "SELECT Photo.id, Photo.path, Photo.name, IFNULL(DATE(EXIFData.date), '###') AS photo_date " +
+                "FROM Photo " +
+                "LEFT JOIN EXIFData ON Photo.exif_data_id = EXIFData.id" +
+                joinLocation +
+                whereClause +
+                ` ORDER BY CASE WHEN EXIFData.date IS NULL THEN 1 ELSE 0 END, EXIFData.date ${orderDir}, Photo.id ${orderDir}` +
+                limitClause
+            );
+        }
+
+        let loadMoreObserver = null;
+        if (!loadAll) {
+            loadMoreObserver = new IntersectionObserver(
+                (entries) => {
+                    if (!hasMore || isFetching) return;
+                    if (entries[0].isIntersecting) {
+                        page += 1;
+                        fetchData();
+                    }
+                },
+                { root: null, rootMargin: "0px", threshold: 0.1 }
+            );
+            loadMoreObserver.observe(sentinel);
+        }
+
+        function fetchData() {
+            if (isFetching || !hasMore) return;
+            isFetching = true;
+            const query = buildPhotoQuery();
+            const result = db.exec(query);
+            if (!result.length || !result[0].values?.length) {
+                hasMore = false;
+                isFetching = false;
+                loadMoreObserver?.disconnect();
+                scheduleFloatingDateUpdate();
+                return;
+            }
+
+            const newLazyImages = [];
+            const rows = result[0].values;
+            for (const row of rows) {
+                const photo = {
+                    id: row[0],
+                    path: row[1],
+                    name: row[2],
+                    date: row[3],
+                };
+
+                if (historyToday) {
+                    if (filter !== null && String(filter).substring(5) !== String(photo.date).substring(5)) {
+                        continue;
+                    }
+                } else {
+                    if (filter !== null && filter !== photo.date) {
+                        continue;
+                    }
+                }
+
+                const created = createPhotoItem(photo);
+                masonry.appendChild(created.item);
+                newLazyImages.push(created.img);
+            }
+
+            if (newLazyImages.length) {
+                $(newLazyImages).lazyload();
+            }
+            resizeAllMasonryItems();
+            isFetching = false;
+        }
+
+        window.addEventListener("scroll", scheduleFloatingDateUpdate, { passive: true });
+        window.addEventListener("resize", () => {
+            requestAnimationFrame(resizeAllMasonryItems);
+        });
+        fetchData();
+    </script>
+    <style>
+        body {
+            background-color: #fff;
+        }
+
+        .album-area {
+            margin-top: 120px;
+            padding-left: 45px;
+            padding-right: 45px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .floating-date {
+            position: fixed;
+            top: 96px;
+            right: 24px;
+            z-index: 10;
+            padding: 10px 12px;
+            border-radius: 999px;
+            font-size: 14px;
+            line-height: 1;
+            letter-spacing: 0.04em;
+            color: rgba(255, 255, 255, 0.92);
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(12px);
+            opacity: 0;
+            transform: translateY(-6px);
+            pointer-events: none;
+            transition: opacity 0.18s ease, transform 0.18s ease;
+        }
+
+        .floating-date.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .gpro-masonry {
+            width: 100%;
+            max-width: 1600px;
+            grid-auto-rows: 8px;
+            gap: 24px;
+            padding-top: 20px;
+        }
+
+        .gpro-item {
+            width: 100%;
+            overflow: hidden;
+            border-radius: 6px;
+        }
+
+        .gpro-item a {
+            display: block;
+        }
+
+        .gpro-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.04);
+            min-height: 120px;
+        }
+
+        .gpro-item:hover {
+            box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
+            transition: box-shadow 0.15s ease-in-out;
+        }
+
+        .gpro-slogan {
+            text-align: center;
+            font-size: 36px;
+            font-weight: 700;
+            color: #3d4350;
+        }
+
+        @media (max-width: 768px) {
+            .gpro-slogan {
+                font-size: 28px;
+            }
+
+            .content-area {
+                margin-top: 80px;
+            }
+
+            .floating-date {
+                top: 78px;
+                right: 16px;
+            }
+        }
+    </style>
+</section>
