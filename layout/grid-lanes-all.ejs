@@ -3,7 +3,7 @@
 <section class="pjax-area">
     <div id="grid-all" class="content-area album-area">
         <div id="floating-date" class="floating-date"></div>
-        <div id="masonry" class="gpro-masonry grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"></div>
+        <div id="masonry" class="gpro-masonry grid grid-cols-2 xs:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-8"></div>
     </div>
     <div id="sentinel" style="height: 1px; opacity: 0;"></div>
     <script type="module">
@@ -273,13 +273,13 @@
     </script>
     <style>
         body {
-            background-color: #fff;
+            background-color: #0b0b0c;
         }
 
         .album-area {
-            margin-top: 120px;
-            padding-left: 45px;
-            padding-right: 45px;
+            margin-top: 92px;
+            padding-left: 12px;
+            padding-right: 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -287,16 +287,17 @@
 
         .floating-date {
             position: fixed;
-            top: 96px;
-            right: 24px;
+            top: 76px;
+            right: 16px;
             z-index: 10;
-            padding: 10px 12px;
+            padding: 8px 10px;
             border-radius: 999px;
-            font-size: 14px;
+            font-size: 13px;
             line-height: 1;
             letter-spacing: 0.04em;
             color: rgba(255, 255, 255, 0.92);
-            background: rgba(0, 0, 0, 0.55);
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             backdrop-filter: blur(12px);
             opacity: 0;
             transform: translateY(-6px);
@@ -311,16 +312,18 @@
 
         .gpro-masonry {
             width: 100%;
-            max-width: 1600px;
-            grid-auto-rows: 8px;
-            gap: 24px;
-            padding-top: 20px;
+            max-width: 2200px;
+            grid-auto-rows: 6px;
+            gap: 6px;
+            padding-top: 0;
         }
 
         .gpro-item {
             width: 100%;
             overflow: hidden;
-            border-radius: 6px;
+            border-radius: 0;
+            outline: 1px solid rgba(255, 255, 255, 0.08);
+            outline-offset: -1px;
         }
 
         .gpro-item a {
@@ -331,14 +334,9 @@
             width: 100%;
             height: auto;
             display: block;
-            border-radius: 6px;
-            background: rgba(0, 0, 0, 0.04);
-            min-height: 120px;
-        }
-
-        .gpro-item:hover {
-            box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
-            transition: box-shadow 0.15s ease-in-out;
+            border-radius: 0;
+            background: rgba(255, 255, 255, 0.04);
+            min-height: 80px;
         }
 
         .gpro-slogan {
@@ -358,8 +356,18 @@
             }
 
             .floating-date {
-                top: 78px;
-                right: 16px;
+                top: 66px;
+                right: 12px;
+            }
+
+            .album-area {
+                padding-left: 8px;
+                padding-right: 8px;
+            }
+
+            .gpro-masonry {
+                gap: 4px;
+                grid-auto-rows: 5px;
             }
         }
     </style>
