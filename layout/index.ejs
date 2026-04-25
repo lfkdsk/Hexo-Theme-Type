@@ -67,21 +67,21 @@
 
     .gpro-slogan {
       text-align: center;
-      font-size: 44px;
-      font-weight: 800;
+      font-size: 40px;
+      font-weight: 700;
       letter-spacing: -0.02em;
-      line-height: 1.15;
+      line-height: 1.2;
       max-width: 820px;
-      background: linear-gradient(120deg, var(--main-color, #71AFDD), var(--sub-color, #6CD9CE));
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      color: transparent;
+      color: #1a1d24;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .gpro-slogan { color: #f3f4f6; }
     }
 
     .gpro-container {
-      margin-top: 80px;
-      gap: 18px;
+      margin-top: 64px;
+      gap: 4px;
       width: 100%;
       max-width: 1320px;
     }
@@ -90,18 +90,18 @@
       aspect-ratio: 3 / 2;
       background-position: center;
       background-size: cover;
-      border-radius: var(--radius-lg, 16px);
+      border-radius: 2px;
       overflow: hidden;
-      box-shadow: var(--shadow-1, 0 1px 3px rgba(15, 23, 42, 0.06));
-      transition: transform var(--duration-3, 360ms) var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)),
-                  box-shadow var(--duration-3, 360ms) var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+      transition: opacity var(--duration-2, 240ms) var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
       min-height: 211px;
-      will-change: transform;
     }
 
-    .gpro-tile:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-hover, 0 18px 40px rgba(15, 23, 42, 0.16));
+    .gpro-container:hover .gpro-tile {
+      opacity: 0.55;
+    }
+
+    .gpro-container:hover .gpro-tile:hover {
+      opacity: 1;
     }
 
     .gpro-tile-descr {
@@ -113,19 +113,13 @@
       color: #fff;
       font-size: 14px;
       display: flex;
-      align-items: flex-end;
-      justify-content: flex-start;
-      text-overflow: clip;
       flex-direction: column;
       align-items: flex-start;
+      justify-content: flex-end;
       transition: opacity var(--duration-2, 240ms) var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
       padding: 18px 20px;
       opacity: 0;
-      background: linear-gradient(180deg, rgba(0, 0, 0, 0) 35%, rgba(0, 0, 0, 0.78) 100%);
-    }
-
-    .gpro-tile-descr > div:first-child {
-      margin-top: auto;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0) 45%, rgba(0, 0, 0, 0.72) 100%);
     }
 
     .gpro-tile:hover .gpro-tile-descr {
@@ -134,11 +128,15 @@
 
     @media (max-width: 768px) {
       .gpro-tile-descr {
-        opacity: 0.85;
+        opacity: 0.9;
+      }
+
+      .gpro-container:hover .gpro-tile {
+        opacity: 1;
       }
 
       .gpro-slogan {
-        font-size: 30px;
+        font-size: 28px;
       }
 
       .content-area {
@@ -146,8 +144,8 @@
       }
 
       .gpro-container {
-        margin-top: 48px;
-        gap: 12px;
+        margin-top: 40px;
+        gap: 2px;
       }
     }
   </style>
