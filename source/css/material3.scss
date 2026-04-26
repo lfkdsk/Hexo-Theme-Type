@@ -265,6 +265,7 @@
     top: 0px;
     display: flex;
     flex-direction: row;
+    align-items: center;
     position: fixed;
     border-bottom: 1px solid var(--border-subtle);
   }
@@ -277,6 +278,7 @@
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     display: -webkit-flex;
     display: flex;
+    align-items: center;
     justify-content: space-evenly;
     -webkit-justify-content: space-evenly;
     //定位
@@ -296,16 +298,35 @@
   .itp-float-bar-item {
     background-color: transparent;
     width: 68px;
+    height: 44px;
     color: $black;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
     transition:
       background-color var(--duration-1) var(--ease-out),
       color var(--duration-1) var(--ease-out);
     border-radius: var(--radius-md);
-    margin: 6px 2px;
+    margin: 0 2px;
 
-    [class*='material-icons-'] {
-      line-height: 44px;
+    // Reset legacy line-height assumptions so flex centering wins for any
+    // child kind: iconpark-icon (web component), material-icons span, or text.
+    .navicon,
+    iconpark-icon,
+    [class*='material-icons-'],
+    span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .navicon,
+    iconpark-icon {
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
     }
   }
 
