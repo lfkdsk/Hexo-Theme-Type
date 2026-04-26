@@ -327,6 +327,10 @@
       font-size: 22px;
       width: 22px;
       height: 22px;
+      // Optical centering nudge — many iconpark glyphs (home, list, image)
+      // carry visual weight toward the bottom edge, so geometric centering
+      // reads as "too low". A 1px upward shift balances the perceived center.
+      transform: translateY(-1px);
     }
   }
 
