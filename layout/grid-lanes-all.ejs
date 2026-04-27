@@ -1290,33 +1290,46 @@
                 }
             };
 
+            const makeThumb = (i) => {
+                const p = loadedPhotos[i];
+                const t = document.createElement('button');
+                t.type = 'button';
+                t.className = 'glv-thumb' + (i === viewerIndex ? ' active' : '');
+                const im = document.createElement('img');
+                im.draggable = false;
+                im.alt = p.name || '';
+                im.src = '<%- config.thumbnail_url %>' + p.path.replace(/\.\w+$/, '.webp');
+                t.appendChild(im);
+                t.addEventListener('click', () => open(i));
+                return t;
+            };
+
+            const attachFilmLoadMore = () => {
+                if (!hasMore || !film.lastChild) return;
+                const obs = new IntersectionObserver((entries) => {
+                    if (!entries[0].isIntersecting || !hasMore || isFetching) return;
+                    obs.disconnect();
+                    const beforeLen = loadedPhotos.length;
+                    page += 1;
+                    fetchData();
+                    for (let i = beforeLen; i < loadedPhotos.length; i++) {
+                        film.appendChild(makeThumb(i));
+                    }
+                    attachFilmLoadMore();
+                }, { root: film, rootMargin: '0px', threshold: 0.1 });
+                obs.observe(film.lastChild);
+            };
+
             const renderFilm = (skipLoadMore) => {
                 film.textContent = '';
                 if (viewerIndex < 0) return;
                 const start = clamp(viewerIndex - 12, 0, loadedPhotos.length - 1);
-                const end = clamp(viewerIndex + 12, 0, loadedPhotos.length - 1);
+                const end = loadedPhotos.length - 1;
                 for (let i = start; i <= end; i++) {
-                    const p = loadedPhotos[i];
-                    const t = document.createElement('button');
-                    t.type = 'button';
-                    t.className = 'glv-thumb' + (i === viewerIndex ? ' active' : '');
-                    const im = document.createElement('img');
-                    im.draggable = false;
-                    im.alt = p.name || '';
-                    im.src = '<%- config.thumbnail_url %>' + p.path.replace(/\.\w+$/, '.webp');
-                    t.appendChild(im);
-                    t.addEventListener('click', () => open(i));
-                    film.appendChild(t);
+                    film.appendChild(makeThumb(i));
                 }
-
-                if (skipLoadMore) return;
-                if (hasMore && !isFetching && end === loadedPhotos.length - 1) {
-                    const before = loadedPhotos.length;
-                    page += 1;
-                    fetchData();
-                    if (loadedPhotos.length !== before && viewerIndex >= 0) {
-                        renderFilm(true);
-                    }
+                if (!skipLoadMore) {
+                    attachFilmLoadMore();
                 }
             };
 
@@ -2172,7 +2185,6 @@
             object-fit: contain;
             image-orientation: from-image;
             transform-origin: center;
-            will-change: transform;
             user-select: none;
             transition: filter 0.18s ease, opacity 0.18s ease;
             box-shadow: 0 18px 70px rgba(0, 0, 0, 0.55);
@@ -2191,7 +2203,6 @@
             height: calc(100% - 24px);
             object-fit: contain;
             transform-origin: center;
-            will-change: transform;
             user-select: none;
             box-shadow: 0 18px 70px rgba(0, 0, 0, 0.55);
             outline: 1px solid rgba(255, 255, 255, 0.08);
