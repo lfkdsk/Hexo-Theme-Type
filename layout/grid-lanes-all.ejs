@@ -1474,18 +1474,35 @@
                 });
             });
 
+            const clampPan = () => {
+                const rect = imgWrap.getBoundingClientRect();
+                const maxTx = rect.width * (viewerZoom.scale - 1) / 2;
+                const maxTy = rect.height * (viewerZoom.scale - 1) / 2;
+                viewerZoom.tx = clamp(viewerZoom.tx, -maxTx, maxTx);
+                viewerZoom.ty = clamp(viewerZoom.ty, -maxTy, maxTy);
+            };
+
             imgWrap.addEventListener(
                 'wheel',
                 (e) => {
                     if (root.hidden) return;
                     e.preventDefault();
+                    const oldScale = viewerZoom.scale;
                     const delta = e.deltaY > 0 ? -0.2 : 0.2;
-                    const next = clamp(viewerZoom.scale + delta, 1, 4);
-                    viewerZoom.scale = next;
+                    const next = clamp(oldScale + delta, 1, 4);
+                    if (next === oldScale) return;
                     if (next === 1) {
                         viewerZoom.tx = 0;
                         viewerZoom.ty = 0;
+                    } else {
+                        const rect = imgWrap.getBoundingClientRect();
+                        const mx = e.clientX - (rect.left + rect.width / 2);
+                        const my = e.clientY - (rect.top + rect.height / 2);
+                        viewerZoom.tx = mx - (mx - viewerZoom.tx) * next / oldScale;
+                        viewerZoom.ty = my - (my - viewerZoom.ty) * next / oldScale;
                     }
+                    viewerZoom.scale = next;
+                    clampPan();
                     applyZoom();
                 },
                 { passive: false }
@@ -1494,11 +1511,20 @@
             imgWrap.addEventListener('dblclick', (e) => {
                 if (root.hidden) return;
                 e.preventDefault();
-                viewerZoom.scale = viewerZoom.scale === 1 ? 2 : 1;
-                if (viewerZoom.scale === 1) {
+                const oldScale = viewerZoom.scale;
+                const next = oldScale === 1 ? 2 : 1;
+                if (next === 1) {
                     viewerZoom.tx = 0;
                     viewerZoom.ty = 0;
+                } else {
+                    const rect = imgWrap.getBoundingClientRect();
+                    const mx = e.clientX - (rect.left + rect.width / 2);
+                    const my = e.clientY - (rect.top + rect.height / 2);
+                    viewerZoom.tx = mx - (mx - viewerZoom.tx) * next / oldScale;
+                    viewerZoom.ty = my - (my - viewerZoom.ty) * next / oldScale;
                 }
+                viewerZoom.scale = next;
+                clampPan();
                 applyZoom();
             });
 
@@ -1515,8 +1541,11 @@
 
             imgWrap.addEventListener('pointermove', (e) => {
                 if (!viewerZoom.panning) return;
-                viewerZoom.tx = viewerZoom.baseTx + (e.clientX - viewerZoom.px);
-                viewerZoom.ty = viewerZoom.baseTy + (e.clientY - viewerZoom.py);
+                const rect = imgWrap.getBoundingClientRect();
+                const maxTx = rect.width * (viewerZoom.scale - 1) / 2;
+                const maxTy = rect.height * (viewerZoom.scale - 1) / 2;
+                viewerZoom.tx = clamp(viewerZoom.baseTx + (e.clientX - viewerZoom.px), -maxTx, maxTx);
+                viewerZoom.ty = clamp(viewerZoom.baseTy + (e.clientY - viewerZoom.py), -maxTy, maxTy);
                 applyZoom();
             });
 
