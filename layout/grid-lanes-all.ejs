@@ -853,11 +853,37 @@
                 render();
             };
 
+            const getFitDimensions = () => {
+                const padW = imgWrap.clientWidth - 24;
+                const padH = imgWrap.clientHeight - 24;
+                if (!img.naturalWidth || !img.naturalHeight) return { fitW: padW, fitH: padH, padW, padH };
+                const nat = img.naturalWidth / img.naturalHeight;
+                let fitW, fitH;
+                if (padW / padH > nat) { fitH = padH; fitW = fitH * nat; }
+                else { fitW = padW; fitH = fitW / nat; }
+                return { fitW, fitH, padW, padH };
+            };
+
             const applyZoom = () => {
-                const t = `translate3d(${viewerZoom.tx}px, ${viewerZoom.ty}px, 0) scale(${viewerZoom.scale})`;
-                img.style.transform = t;
-                if (liveVideoEl) liveVideoEl.style.transform = t;
-                btnZoom.textContent = `${viewerZoom.scale.toFixed(1)}×`;
+                const s = viewerZoom.scale;
+                btnZoom.textContent = `${s.toFixed(1)}×`;
+                const t = `translate3d(${viewerZoom.tx}px, ${viewerZoom.ty}px, 0)`;
+                if (s <= 1) {
+                    img.style.removeProperty('width');
+                    img.style.removeProperty('height');
+                    img.style.removeProperty('max-width');
+                    img.style.removeProperty('max-height');
+                    img.style.transform = '';
+                    if (liveVideoEl) liveVideoEl.style.transform = '';
+                } else {
+                    const { fitW, fitH } = getFitDimensions();
+                    img.style.maxWidth = 'none';
+                    img.style.maxHeight = 'none';
+                    img.style.width = `${fitW * s}px`;
+                    img.style.height = `${fitH * s}px`;
+                    img.style.transform = t;
+                    if (liveVideoEl) liveVideoEl.style.transform = `${t} scale(${s})`;
+                }
             };
 
             const resetZoom = () => {
@@ -1475,9 +1501,10 @@
             });
 
             const clampPan = () => {
-                const rect = imgWrap.getBoundingClientRect();
-                const maxTx = rect.width * (viewerZoom.scale - 1) / 2;
-                const maxTy = rect.height * (viewerZoom.scale - 1) / 2;
+                if (viewerZoom.scale <= 1) { viewerZoom.tx = 0; viewerZoom.ty = 0; return; }
+                const { fitW, fitH, padW, padH } = getFitDimensions();
+                const maxTx = Math.max(0, (fitW * viewerZoom.scale - padW) / 2);
+                const maxTy = Math.max(0, (fitH * viewerZoom.scale - padH) / 2);
                 viewerZoom.tx = clamp(viewerZoom.tx, -maxTx, maxTx);
                 viewerZoom.ty = clamp(viewerZoom.ty, -maxTy, maxTy);
             };
@@ -1541,9 +1568,9 @@
 
             imgWrap.addEventListener('pointermove', (e) => {
                 if (!viewerZoom.panning) return;
-                const rect = imgWrap.getBoundingClientRect();
-                const maxTx = rect.width * (viewerZoom.scale - 1) / 2;
-                const maxTy = rect.height * (viewerZoom.scale - 1) / 2;
+                const { fitW, fitH, padW, padH } = getFitDimensions();
+                const maxTx = Math.max(0, (fitW * viewerZoom.scale - padW) / 2);
+                const maxTy = Math.max(0, (fitH * viewerZoom.scale - padH) / 2);
                 viewerZoom.tx = clamp(viewerZoom.baseTx + (e.clientX - viewerZoom.px), -maxTx, maxTx);
                 viewerZoom.ty = clamp(viewerZoom.baseTy + (e.clientY - viewerZoom.py), -maxTy, maxTy);
                 applyZoom();
