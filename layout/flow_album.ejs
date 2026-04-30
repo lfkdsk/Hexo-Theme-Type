@@ -1,0 +1,220 @@
+<script src="js/mini-live-photo.js"></script>
+<section class="pjax-area flow-album">
+  <div class="flow-root">
+    <div class="flow-header">
+      <h1 class="flow-title"><%- page.title %></h1>
+      <p class="flow-sub">
+        <% if (page.subtitle && page.subtitle.length) { %>
+          <%= page.subtitle %>
+        <% } else { %>
+          <%= page.date.format(config.date_format) %>
+        <% } %>
+      </p>
+    </div>
+    <% if (page.content && page.content.length) { %>
+      <div class="flow-intro article"><%- page.content %></div>
+    <% } %>
+    <div class="flow-grid" id="flow-grid">
+      <% for (var i in page.photos) { %>
+        <% var p = page.photos[i]; %>
+        <%
+          function searchPhoto(data, url) {
+            if (!data) return {};
+            try {
+              if (data && data[url]) return data[url];
+            } catch (e) {}
+            for (var key in data) {
+              if (key.toString() == url) return data[key];
+            }
+            return {};
+          }
+          var extra0 = searchPhoto(site.data.photos, p.share);
+          var exifData = extra0.exif_data || {};
+          var maker = exifData['Image Make'] || '';
+          var model = exifData['Image Model'] || '';
+          var lens = exifData['EXIF LensModel'] || '';
+          var focal = exifData['EXIF FocalLength'] || '';
+          var fnum = exifData['EXIF FNumber'] || '';
+          var iso = exifData['EXIF ISOSpeedRatings'] || '';
+          var expo = exifData['EXIF ExposureTime'] || '';
+          var loc = extra0.location || [];
+          var locText = (loc && loc.length === 2) ? (String(Number(loc[0]).toFixed(5)) + ', ' + String(Number(loc[1]).toFixed(5))) : '';
+          var shot = (maker || model) ? (maker + (maker && model ? ' ' : '') + model) : '';
+          var line = '';
+          if (shot) line += 'SHOT ON ' + shot;
+          if (lens) line += (line ? ', ' : '') + lens;
+          if (focal || fnum) line += (line ? ' — ' : '') + [focal, fnum].filter(Boolean).join(' ');
+        %>
+        <figure class="flow-card">
+          <a class="flow-imgwrap" href="javascript:void(0)" data-url="<%- p.url %>" data-thum="<%- p.thum %>" data-name="<%- p.name %>" data-share="<%- p.share %>" data-video="<%- p.video %>" onclick="flowOpen(this)">
+            <img class="flow-img" alt="<%- p.name %>" loading="lazy" decoding="async" src="<%- p.thum %>" data-full="<%- p.url %>"/>
+          </a>
+          <figcaption class="flow-cap">
+            <div class="flow-shot">
+              <div class="flow-shot-title"><%- p.name %></div>
+              <% if (line) { %>
+                <div class="flow-shot-line"><%= line %></div>
+              <% } %>
+            </div>
+            <div class="flow-meta">
+              <% if (locText) { %>
+                <div class="flow-kv"><div class="k">LOCATION</div><div class="v"><%= locText %></div></div>
+              <% } %>
+              <% if (fnum) { %>
+                <div class="flow-kv"><div class="k">F NUMBER</div><div class="v"><%= fnum.replace(/^F\\s*/i,'') %></div></div>
+              <% } %>
+              <% if (iso) { %>
+                <div class="flow-kv"><div class="k">ISO</div><div class="v"><%= iso.replace(/^ISO\\s*/i,'') %></div></div>
+              <% } %>
+              <% if (expo) { %>
+                <div class="flow-kv"><div class="k">EXPOSURE</div><div class="v"><%= expo.replace(/s$/i,'') %></div></div>
+              <% } %>
+              <% if (focal) { %>
+                <div class="flow-kv"><div class="k">FOCAL</div><div class="v"><%= focal.replace(/mm$/i,'') %> MM</div></div>
+              <% } %>
+            </div>
+          </figcaption>
+        </figure>
+      <% } %>
+    </div>
+  </div>
+  <div class="flow-viewer" id="flow-viewer" hidden>
+    <div class="fv-topbar">
+      <button class="fv-close" aria-label="Close" onclick="flowClose()">×</button>
+      <div class="fv-title" id="fv-title"></div>
+    </div>
+    <div class="fv-stage">
+      <img id="fv-img" class="fv-img" alt="viewer" />
+    </div>
+  </div>
+  <script>
+    (function(){
+      const grid = document.getElementById('flow-grid');
+      if (grid) {
+        const supportsGap = CSS.supports('gap', '12px');
+        grid.style.setProperty('--gap', supportsGap ? '14px' : '12px');
+      }
+    })();
+    (function(){
+      const items = document.querySelectorAll('.flow-imgwrap');
+      items.forEach((el) => {
+        const video = el.getAttribute('data-video') || '';
+        if (typeof attachLivePhoto === 'function') attachLivePhoto(el, Boolean(video), video);
+      });
+    })();
+    (function(){
+      if (!('IntersectionObserver' in window)) return;
+      const io = new IntersectionObserver((entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          io.unobserve(e.target);
+          const img = e.target;
+          const full = img.getAttribute('data-full');
+          if (!full) continue;
+          const hi = new Image();
+          hi.src = full;
+          const swap = () => {
+            if (!img.isConnected) return;
+            img.src = full;
+          };
+          if (hi.decode) hi.decode().then(swap).catch(() => hi.complete && swap());
+          else hi.onload = swap;
+        }
+      }, { rootMargin: '300px 0px' });
+      document.querySelectorAll('img.flow-img[data-full]').forEach((img) => io.observe(img));
+    })();
+    let fvRoot = document.getElementById('flow-viewer');
+    let fvImg = document.getElementById('fv-img');
+    let fvTitle = document.getElementById('fv-title');
+    let fvSeq = 0;
+    let fvOpen = false;
+
+    function flowSyncViewerState(){
+      if (fvOpen) {
+        fvRoot.hidden = false;
+        document.body.style.overflow = 'hidden';
+      } else {
+        fvRoot.hidden = true;
+        document.body.style.overflow = '';
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (!fvOpen) return;
+      if (e.key === 'Escape') flowClose();
+    });
+
+    fvRoot.addEventListener('click', (e) => {
+      if (!fvOpen) return;
+      if (e.target === fvRoot) flowClose();
+      if (e.target && e.target.classList && e.target.classList.contains('fv-stage')) flowClose();
+    });
+
+    function flowOpen(el){
+      const th = el.getAttribute('data-thum');
+      const url = el.getAttribute('data-url');
+      const name = el.getAttribute('data-name') || '';
+      fvTitle.textContent = name;
+      fvOpen = true;
+      flowSyncViewerState();
+      if (th) fvRoot.style.setProperty('--fv-bg', `url(\"${th}\")`);
+      fvImg.src = th;
+      fvRoot.classList.add('is-loading');
+      const seq = ++fvSeq;
+      const hi = new Image();
+      hi.src = url;
+      const swap = () => {
+        if (seq !== fvSeq) return;
+        fvImg.src = url;
+        fvRoot.classList.remove('is-loading');
+      };
+      if (hi.decode) {
+        hi.decode().then(swap).catch(()=>hi.complete && swap());
+      } else {
+        hi.onload = swap;
+      }
+    }
+    function flowClose(){
+      fvOpen = false;
+      flowSyncViewerState();
+      fvRoot.classList.remove('is-loading');
+      fvSeq++;
+    }
+  </script>
+  <style>
+    html, body{background:#0b0b0c}
+    .flow-album{background:#0b0b0c;color:#f3f3f3;min-height:100vh}
+    .flow-root{max-width:1120px;margin:0 auto;padding:88px 16px 20px}
+    .flow-header{margin: 8px 0 18px 0}
+    .flow-title{color:#f6f7f8;font:700 40px/1.05 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0 0 8px 0;letter-spacing:-.01em}
+    .flow-sub{color:rgba(243,243,243,.82);opacity:1;margin:0;font-size:14px}
+    .flow-intro{max-width: 760px;opacity:.9;margin: 18px 0 26px 0}
+    .flow-grid{--gap:26px;display:flex;flex-direction:column;gap: var(--gap)}
+    .flow-card{margin:0}
+    .flow-imgwrap{display:block;position:relative;width:100%;background: #101012;border-radius: 16px;overflow:hidden}
+    .flow-img{width:100%;height:auto;display:block;object-fit:cover}
+    .flow-cap{display:flex;gap: 18px;justify-content:space-between;align-items:flex-start;padding:14px 2px 0 2px}
+    .flow-shot{min-width: 0}
+    .flow-shot-title{font-weight:700;font-size:14px;letter-spacing:.01em}
+    .flow-shot-line{margin-top:6px;opacity:.86;font-size:12px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .flow-meta{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap: 14px;align-items:start}
+    .flow-kv .k{font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:.7}
+    .flow-kv .v{margin-top:4px;font-size:12px;font-weight:650;letter-spacing:.02em}
+    @media (max-width: 768px){
+      .flow-root{padding:72px 12px 16px}
+      .flow-title{font-size:30px}
+      .flow-cap{flex-direction:column;gap: 12px}
+      .flow-shot-line{white-space:normal}
+      .flow-meta{grid-auto-flow:row;grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    .flow-viewer{--fv-bg:none;position:fixed;inset:0;background:#070708;z-index:999}
+    .flow-viewer::before{content:"";position:absolute;inset:-30px;background-image:var(--fv-bg);background-size:cover;background-position:center;filter: blur(44px) saturate(1.15);transform:scale(1.08);opacity:.55}
+    .flow-viewer::after{content:"";position:absolute;inset:0;background:radial-gradient(1200px 600px at 50% 35%, rgba(255,255,255,.10) 0%, rgba(0,0,0,.55) 48%, rgba(0,0,0,.86) 100%)}
+    .fv-topbar{position:absolute;top:12px;left:12px;right:12px;display:flex;align-items:center;gap:10px;z-index:2}
+    .fv-title{color:#fff;font-weight:650;opacity:.9}
+    .fv-close{margin-right:auto;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.35);color:#fff;border-radius:12px;height:34px;padding:0 12px;font-size:18px;backdrop-filter: blur(10px)}
+    .fv-stage{position:absolute;inset:0;display:grid;place-items:center;padding:64px 16px 22px;z-index:1}
+    .flow-viewer.is-loading{cursor:progress}
+    .fv-img{max-width:min(92vw, 1400px);max-height:calc(100vh - 92px);object-fit:contain;box-shadow:0 18px 70px rgba(0,0,0,.55);outline:1px solid rgba(255,255,255,.08);border-radius:8px}
+  </style>
+</section>
