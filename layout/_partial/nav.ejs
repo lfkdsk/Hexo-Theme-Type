@@ -126,7 +126,9 @@
 </div>
 <div class="itp-nav-sheet-bg" id="itp_nav_sheet_bg"></div>
 <style>
-  .itp-nav-more { display: none; }
+  /* the SCSS .itp-float-bar .itp-float-bar-item rule is 2-class specificity,
+     so we have to match it here or `display: inline-flex` wins on desktop */
+  .itp-float-bar .itp-nav-more { display: none; }
   .itp-nav-sheet, .itp-nav-sheet-bg { display: none; }
   @media (max-width: 768px) {
     /* hide overflow nav items in the floatbar; sheet shows them all */
