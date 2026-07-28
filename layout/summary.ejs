@@ -358,11 +358,36 @@
 </section>
 
 <script type="module">
-    // 设置全局Chart.js配置
-    Chart.defaults.color = '#fff';
-    Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
-    Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-    Chart.defaults.plugins.legend.labels.color = '#fff';
+    // Chart.js 的配色从 CSS 变量读，这样图表能跟着皮肤走。Chart.js 自己不认
+    // var(--…)——它把颜色交给 canvas，canvas 不参与 CSS 级联——所以必须在 JS 里
+    // 先解析成具体值。skin 运行时可切，故把取色和重绘包成函数复用。
+    const cssVar = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+    const series = () => cssVar('--recap-series').split(',').map(c => c.trim()).filter(Boolean);
+    const seriesAt = (i, p) => p[i % p.length];   // 条目多于色板时循环取用
+
+    function applyChartTheme() {
+        Chart.defaults.color = cssVar('--recap-fg');
+        Chart.defaults.borderColor = cssVar('--recap-grid');
+        Chart.defaults.plugins.tooltip.backgroundColor = cssVar('--recap-tooltip');
+        Chart.defaults.plugins.legend.labels.color = cssVar('--recap-fg');
+    }
+    applyChartTheme();
+
+    // 切皮肤后把画好的图表重新上色。图表在下面创建时逐个登记到 charts。
+    // 切皮肤后重建图表。不能只改 dataset 的颜色再 update()——Chart.js 把解析好的
+    // 配置缓存在元素上（element.options），实测无论用 update()、update('none')、
+    // 清 controller._cachedDataOpts 还是改成函数式配置，元素级的颜色都不会刷新。
+    // 图表很轻，直接销毁重建最省心也最可靠：工厂函数在调用时才读 CSS 变量。
+    const chartSlots = [];
+    function mountChart(factory) {
+        const slot = { factory, chart: factory() };
+        chartSlots.push(slot);
+        return slot.chart;
+    }
+    new MutationObserver(() => {
+        applyChartTheme();
+        chartSlots.forEach(slot => { slot.chart.destroy(); slot.chart = slot.factory(); });
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-skin'] });
 
     const SQL = await initSqlJs({
         locateFile: file => `<%- config.root %>js/sql-wasm.wasm`
@@ -563,13 +588,13 @@
         window.addEventListener('scroll', updateProgressBar);
 
         // 初始化图表
-        new Chart(document.getElementById('cameraChart'), {
+        mountChart(() => new Chart(document.getElementById('cameraChart'), {
             type: 'doughnut',
             data: {
                 labels: DATA.maker.map(([maker]) => maker),
                 datasets: [{
                     data: DATA.maker.map(([_, count]) => count),
-                    backgroundColor: DATA.maker.map(([maker]) => generatePastelColor()),
+                    backgroundColor: DATA.maker.map((_, i) => seriesAt(i, series())),
                     borderWidth: 0
                 }]
             },
@@ -588,7 +613,7 @@
                     }
                 }
             }
-        });
+        }));
 
         function renderStats(lensData) {
             const lens = document.createElement('ul');
@@ -612,14 +637,14 @@
         const location = document.getElementById("location")
         location.appendChild(renderStats(DATA.locations))
 
-        new Chart(document.getElementById('apertureChart'), {
+        mountChart(() => new Chart(document.getElementById('apertureChart'), {
             type: 'bar',
             data: {
                 labels: DATA.F.map(([f]) => f),
                 datasets: [{
                     label: '使用次数',
                     data: DATA.F.map(([_, count]) => count),
-                    backgroundColor: '#007AFF',
+                    backgroundColor: cssVar('--recap-accent'),
                     borderRadius: 4
                 }]
             },
@@ -635,7 +660,7 @@
                     y: {
                         beginAtZero: true,
                         grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
+                            color: cssVar('--recap-grid')
                         }
                     },
                     x: {
@@ -645,7 +670,7 @@
                     }
                 }
             }
-        });
+        }));
 
         function renderMonthlyPhotos(container, data) {
             const card = document.createElement('section');

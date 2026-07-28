@@ -103,6 +103,11 @@
   --recap-accent: #007aff;    // 招牌渐变的起止色，用在大数字和顶部进度条
   --recap-accent-2: #ff2d55;
   --recap-scrim: rgba(0, 0, 0, 0.8); // 压在照片上的遮罩，与画布明暗无关
+  --recap-grid: rgba(255, 255, 255, 0.1);      // 图表网格线与轴线
+  --recap-tooltip: rgba(0, 0, 0, 0.8);
+  // 甜甜圈图的分类色板。逗号分隔，JS 端 split 后按序取用；条目不够时循环。
+  // 原来这里用的是每次刷新都重新随机的 hsl()，同一份数据每次进来配色都不一样。
+  --recap-series: #7cc0f0, #f6a96b, #8fd6c4, #d99ac8, #c9cf6b, #9aa6e8;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -226,6 +231,10 @@
   --recap-card: rgba(255, 240, 220, 0.05);
   --recap-accent: #d9954a;
   --recap-accent-2: #8c5a2b;
+  --recap-grid: rgba(255, 240, 220, 0.1);
+  --recap-tooltip: rgba(0, 0, 0, 0.85);
+  // 暗房只用安全灯那一族暖色，深浅拉开层次
+  --recap-series: #d9954a, #b8763a, #8c5a2b, #e0b077, #a86f45, #6e4520;
 }
 
 // ─── gallery ───────────────────────────────────────────────────────────────
@@ -278,6 +287,10 @@
   --recap-card: rgba(28, 25, 20, 0.05);
   --recap-accent: #1c1914;
   --recap-accent-2: #7d766c;
+  --recap-grid: rgba(28, 25, 20, 0.12);
+  --recap-tooltip: rgba(28, 25, 20, 0.86);
+  // 画廊是单色的：一条从墨黑到浅灰的明度阶梯，除了照片没有颜色
+  --recap-series: #1c1914, #4a453c, #6d675c, #928b7e, #b5aea1, #d5cfc4;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -351,6 +364,10 @@
   --recap-card: rgba(40, 32, 20, 0.06);
   --recap-accent: #8c2f1d;
   --recap-accent-2: #b5723a;
+  --recap-grid: rgba(40, 32, 20, 0.14);
+  --recap-tooltip: rgba(26, 22, 19, 0.88);
+  // 杂志：赭红到赭黄的印刷色系
+  --recap-series: #8c2f1d, #b5723a, #6b6154, #c9a06a, #a44b33, #857a63;
 }
 
 @media (prefers-color-scheme: dark) {
