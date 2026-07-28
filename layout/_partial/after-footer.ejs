@@ -6,16 +6,13 @@
 <link rel="stylesheet" href="<% url_for('/css/fancybox.css') %>" />
 <script src="<%- url_for('/js/fancybox.umd.js') %>" defer></script>
 <% } %>
-<!-- mdui -->
-<% if (theme.schemes =='column' ){ %>
-<%- js('js/mdui.min.js') %>
-<% } %>
 <!-- busuanzi -->
 <% if (theme.busuanzi == true){ %>
 <!-- <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" defer></script> -->
 <% } %>
 <!-- highlightjs -->
-<% if(theme.highlight.use == true) { %>
+<%# 条件与 head.ejs 里加载高亮 CSS 的条件必须一致，说明见那里 %>
+<% if(theme.highlight.use == true && /<pre[ >]|<code[ >]/.test(page.content || '')) { %>
 <% if(theme.cdn.use == 'jsdelivr') { %>
 <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/highlight.min.js" defer></script>
 <% } else if ( theme.cdn.use == 'self_host') { %>
@@ -91,4 +88,7 @@
     };
   }
 </script>
+<% } %>
+<% if (theme.skin_devtool) { %>
+<%- partial("_partial/skin-devtool") %>
 <% } %>

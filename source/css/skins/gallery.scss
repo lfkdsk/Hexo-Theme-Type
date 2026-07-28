@@ -1,0 +1,78 @@
+/** @format */
+
+@import '../_customize';
+
+//
+// `gallery` 皮肤的结构性部分——token 只能改值，改不了"标题放哪里"。
+//
+// 核心一招：把图块标题从压在照片上的遮罩，改成照片下方的一行说明文字，
+// 就像美术馆展签。遮罩会吃掉照片下三分之一的暗部细节，展签不会；
+// 代价是每张图多占一点纵向空间，但这套皮肤本来就以留白换清晰。
+//
+
+[data-skin='gallery'] {
+  // 图块不再是固定比例的裁切框，改成"照片 + 下方展签"的竖排
+  .gpro-tile {
+    aspect-ratio: auto;
+    overflow: visible;
+    background-color: transparent;
+  }
+
+  .gpro-tile img {
+    aspect-ratio: 3 / 2;
+    height: auto;
+    background-color: var(--surface-muted);
+  }
+
+  // 展签：常驻、左对齐、用页面文字色而不是白字
+  .gpro-tile-descr {
+    position: static;
+    opacity: 1;
+    background: none;
+    color: var(--text-strong);
+    padding: 14px 0 0;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 2px;
+
+    .text-xl {
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+    }
+
+    .text-sm {
+      font-size: 12px;
+      color: var(--text-muted);
+      opacity: 1;
+      letter-spacing: 0.06em;
+    }
+  }
+
+  // 展签常驻，就不需要 hover 才浮现那套了
+  .gpro-tile:hover .gpro-tile-descr {
+    opacity: 1;
+  }
+
+  // 只让照片本身对 hover 有反应，展签保持可读
+  .gpro-container:hover .gpro-tile img {
+    transition: opacity var(--duration-2) var(--ease-out);
+  }
+
+  .gpro-tile:hover img {
+    opacity: 0.88;
+  }
+
+  // 标语退成一行小字号的引言，让位给作品
+  .gpro-slogan {
+    text-transform: uppercase;
+    max-width: 640px;
+  }
+}
+
+@media (max-width: 768px) {
+  [data-skin='gallery'] .gpro-tile-descr {
+    opacity: 1;
+    padding: 10px 0 0;
+  }
+}

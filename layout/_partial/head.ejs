@@ -82,16 +82,18 @@
   <script src="<%= theme.nav_style_src %>"></script>
   <% } %>
   <%- partial('_partial/fonts') %>
+  <%# 设计令牌。必须排在最前：下面每个样式表都从它读 var(--…) %>
+  <%- css(('css/tokens')) %>
   <!-- Custom CSS/Sass -->
   <%- css(('css/style')) %>
   <%- css(('css/fancybox')) %>
-  <!--样式切换-->
-  <% if (theme.schemes =='column' ){ %>
-  <%- css(('css/mdui.min')) %>
-  <%- css(url_for('css/column')) %>
-  <%} else if (theme.schemes =='m3' ){ %>
   <%- css(('css/material3')) %>
-  <% } %>
+  <%# 皮肤覆盖层。始终全部加载（而非按 skin 条件加载），这样切换只是给 <html> 换个
+      data-skin 值，运行时即时生效，方便对比调设计。规则全在 [data-skin=…] 作用域下，
+      几套加起来也只有十几 KB，在一个照片站里是噪音。 %>
+  <% ['classic', 'darkroom', 'gallery', 'editorial'].forEach(function (s) { %>
+  <%- css('css/skins/' + s) %>
+  <% }); %>
   <% if (page.layout =='gallery' ){ %>
   <%- css(('css/gallery')) %>
   <% } %>
@@ -106,7 +108,12 @@
   <% if (page.layout =='gallery2' ){ %>
   <%- css(('css/gallery2')) %>
   <% } %>
-  <% if(theme.highlight.use == true) { %>
+  <%#
+    highlight 只在页面真的有代码块时才加载。全站 114 页里只有 3 页有 <pre>，
+    以前却每页都拉 highlight.min.js(119KB) + 主题 CSS。<pre> 全部来自 page.content
+    （没有任何 layout 自己产出 <pre>），所以查 content 就够。
+  %>
+  <% if(theme.highlight.use == true && /<pre[ >]|<code[ >]/.test(page.content || '')) { %>
   <!--highlight.js CSS-->
   <% if(theme.highlight.style == 'github' ) { %>
   <%- css(('css/highlight/github')) %>

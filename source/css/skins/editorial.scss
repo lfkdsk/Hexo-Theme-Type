@@ -1,0 +1,87 @@
+/** @format */
+
+@import '../_customize';
+
+//
+// `editorial` 皮肤的结构性部分。
+//
+// 两招：
+// 1) 首图跨两列做头条——杂志封面故事的位置关系，一眼分出主次；
+// 2) 图块标题改成照片下方的图注，标题上方一道细横线，是印刷版面的分栏惯例。
+//
+// 配合 tokens.scss 里的衬线标题、米白纸底和放大的间距尺度。
+//
+
+[data-skin='editorial'] {
+  // 头条：第一张跨两列。aspect-ratio 不变，所以它自然更高，形成版面重心。
+  .gpro-tile:first-child {
+    @media (min-width: 768px) {
+      grid-column: span 2;
+    }
+  }
+
+  .gpro-tile {
+    aspect-ratio: auto;
+    overflow: visible;
+    background-color: transparent;
+  }
+
+  .gpro-tile img {
+    aspect-ratio: 3 / 2;
+    height: auto;
+    background-color: var(--surface-muted);
+  }
+
+  // 图注：横线 + 衬线标题 + 小字号日期
+  .gpro-tile-descr {
+    position: static;
+    opacity: 1;
+    background: none;
+    color: var(--text-strong);
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 12px 0 0;
+    border-top: 1px solid var(--border-subtle);
+    margin-top: 12px;
+    gap: 4px;
+
+    .text-xl {
+      font-family: var(--slogan-family);
+      font-size: 19px;
+      font-weight: 400;
+      line-height: 1.3;
+    }
+
+    .text-sm {
+      font-size: 11px;
+      color: var(--text-muted);
+      opacity: 1;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+  }
+
+  .gpro-tile:hover .gpro-tile-descr {
+    opacity: 1;
+  }
+
+  .gpro-tile:hover img {
+    opacity: 0.9;
+  }
+
+  // 标语当报头用：衬线、居中、下方一道通栏细线
+  .gpro-slogan {
+    max-width: 700px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border-subtle);
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  [data-skin='editorial'] .gpro-tile-descr {
+    opacity: 1;
+    padding: 10px 0 0;
+    margin-top: 10px;
+  }
+}

@@ -36,6 +36,24 @@ apple_icon:
 # column is out of support
 schemes: m3
 
+# Skin 皮肤
+# Use modern ｜ classic ｜ darkroom ｜ gallery ｜ editorial
+#   modern    现在线上这套：柔和圆角、层次阴影、四列图墙
+#   classic   token 重构之前的老样子，留作对比档
+#   darkroom  暗房。恒暗底、五/六列接触样张、重压暗、琥珀强调色
+#   gallery   画廊。纸白底、大留白、照片下方展签、零阴影零圆角
+#   editorial 杂志。米白纸底、衬线大标题、首图跨两列做头条、图注带横线
+# 换的是「同一套结构下的视觉语言」——圆角、阴影、留白、动效、组件形状，
+# 不像 schemes 那样换页面结构。写到 <html data-skin>，由 source/css/tokens.scss
+# 里对应的 [data-skin='…'] 块接管，两套皮肤都在产物里，运行时改这个属性即可切换：
+#   document.documentElement.dataset.skin = 'classic'
+# gallery 仓库可以用 CONFIG.yml 的 theme_config: { skin: … } 覆盖这里。
+skin: modern
+
+# 皮肤调试面板。开了会在右下角出现一个悬浮按钮，可以实时切皮肤、拖动调 token，
+# 并把结果导出成能直接粘回 source/css/tokens.scss 的代码。默认关，线上访客看不到。
+skin_devtool: false
+
 # Fonts
 # Use LXGW ｜
 fonts:

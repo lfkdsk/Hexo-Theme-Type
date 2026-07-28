@@ -1,0 +1,324 @@
+<%#
+  皮肤调试面板 —— 只在主题配置 skin_devtool: true 时渲染，默认关，线上访客看不到。
+
+  它做的事很简单：把改动写进 <html> 的 inline style。inline style 的优先级高过
+  tokens.scss 里任何 :root / [data-skin] 规则，所以每个 var(--…) 立刻重新求值，
+  整站即时变样，不用重新构建。改动存 localStorage，翻页不丢。
+
+  面板自身刻意【不使用】任何 token 上色——不然把 --surface-1 调成黑色，面板自己
+  也会跟着看不见。
+%>
+<div id="skin-devtool" data-open="false">
+  <button id="sdt-toggle" type="button" title="皮肤调试面板">🎨</button>
+
+  <div id="sdt-panel" role="dialog" aria-label="皮肤调试面板">
+    <header>
+      <span>皮肤调试</span>
+      <button id="sdt-close" type="button" aria-label="关闭">×</button>
+    </header>
+
+    <div id="sdt-body"></div>
+
+    <footer>
+      <button id="sdt-export" type="button">复制为 tokens.scss</button>
+      <button id="sdt-reset" type="button" class="ghost">重置</button>
+    </footer>
+  </div>
+</div>
+
+<style>
+  /* 全部写死，不读 token —— 见顶部说明 */
+  #skin-devtool { position: fixed; right: 16px; bottom: 76px; z-index: 99999;
+    font: 13px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif; }
+  @media (min-width: 1022px) { #skin-devtool { bottom: 16px; } }
+
+  #sdt-toggle { width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(0,0,0,.12);
+    background: #fff; box-shadow: 0 6px 20px rgba(0,0,0,.18); cursor: pointer; font-size: 20px;
+    line-height: 1; display: grid; place-items: center; padding: 0; }
+  #sdt-toggle:hover { transform: translateY(-1px); }
+
+  #sdt-panel { display: none; position: absolute; right: 0; bottom: 54px; width: 300px;
+    max-height: min(70vh, 620px); overflow: auto; overscroll-behavior: contain;
+    background: #fff; color: #1f2430; border: 1px solid rgba(0,0,0,.1); border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.28); }
+  #skin-devtool[data-open="true"] #sdt-panel { display: block; }
+
+  #sdt-panel header { position: sticky; top: 0; z-index: 1; display: flex; align-items: center;
+    justify-content: space-between; padding: 12px 14px; font-weight: 600;
+    background: #fff; border-bottom: 1px solid rgba(0,0,0,.08); }
+  #sdt-close { border: 0; background: none; font-size: 20px; line-height: 1; cursor: pointer;
+    color: #6b7280; padding: 0 2px; }
+
+  #sdt-body { padding: 4px 14px 12px; }
+  .sdt-group { margin-top: 14px; }
+  .sdt-group > b { display: block; font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+    color: #9096a2; margin-bottom: 6px; }
+  .sdt-row { display: grid; grid-template-columns: 76px 1fr 42px; align-items: center;
+    gap: 8px; margin: 5px 0; }
+  .sdt-row > label { color: #4b5563; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sdt-row output { text-align: right; color: #6b7280; font-variant-numeric: tabular-nums; font-size: 12px; }
+  .sdt-row input[type="range"] { width: 100%; accent-color: #71afdd; }
+  .sdt-row input[type="color"] { width: 100%; height: 24px; padding: 0; border: 1px solid rgba(0,0,0,.15);
+    border-radius: 6px; background: none; cursor: pointer; }
+  .sdt-row select { width: 100%; padding: 3px 6px; border: 1px solid rgba(0,0,0,.15);
+    border-radius: 6px; background: #fff; color: inherit; font: inherit; }
+
+  .sdt-seg { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .sdt-seg button { padding: 7px 0; border: 1px solid rgba(0,0,0,.15); border-radius: 8px;
+    background: #fff; color: #4b5563; cursor: pointer; font: inherit; font-size: 12px; }
+  .sdt-seg button[aria-pressed="true"] { background: #71afdd; border-color: #71afdd; color: #fff; font-weight: 600; }
+
+  #sdt-panel footer { position: sticky; bottom: 0; display: grid; grid-template-columns: 1fr auto;
+    gap: 8px; padding: 10px 14px; background: #fff; border-top: 1px solid rgba(0,0,0,.08); }
+  #sdt-panel footer button { padding: 8px 12px; border-radius: 8px; border: 1px solid #71afdd;
+    background: #71afdd; color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+  #sdt-panel footer button.ghost { background: #fff; color: #6b7280; border-color: rgba(0,0,0,.15); font-weight: 400; }
+
+  @media (prefers-color-scheme: dark) {
+    #sdt-toggle, #sdt-panel, #sdt-panel header, #sdt-panel footer { background: #24262b; }
+    #sdt-toggle { border-color: rgba(255,255,255,.14); }
+    #sdt-panel { color: #e7eaf0; border-color: rgba(255,255,255,.12); }
+    #sdt-panel header { border-bottom-color: rgba(255,255,255,.1); }
+    #sdt-panel footer { border-top-color: rgba(255,255,255,.1); }
+    .sdt-row > label { color: #b9bec9; }
+    .sdt-seg button, .sdt-row select { background: #2d3036; color: #b9bec9; border-color: rgba(255,255,255,.14); }
+    .sdt-seg button[aria-pressed="true"] { background: #71afdd; color: #14161a; }
+    #sdt-panel footer button.ghost { background: #2d3036; color: #b9bec9; border-color: rgba(255,255,255,.14); }
+  }
+</style>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var KEY = 'sdt.overrides.v1';
+  var DEFAULT_SKIN = '<%= theme.skin || "modern" %>';   // 配置里的皮肤，重置时回到它
+
+  // 阴影没法用滑块调（它是一串复合值），给几档预设换整组。
+  var SHADOWS = {
+    '（不改）': null,
+    '无':   { '--shadow-1': 'none', '--shadow-2': 'none', '--shadow-3': 'none', '--shadow-hover': 'none' },
+    '轻':   { '--shadow-1': '0 1px 2px rgba(15,23,42,.04)',
+              '--shadow-2': '0 2px 6px rgba(15,23,42,.05)',
+              '--shadow-3': '0 6px 16px rgba(15,23,42,.07)',
+              '--shadow-hover': '0 10px 24px rgba(15,23,42,.09)' },
+    '重':   { '--shadow-1': '0 2px 4px rgba(15,23,42,.08), 0 1px 3px rgba(15,23,42,.10)',
+              '--shadow-2': '0 8px 20px rgba(15,23,42,.12), 0 3px 8px rgba(15,23,42,.08)',
+              '--shadow-3': '0 20px 44px rgba(15,23,42,.18), 0 8px 18px rgba(15,23,42,.10)',
+              '--shadow-hover': '0 28px 60px rgba(15,23,42,.22), 0 10px 24px rgba(15,23,42,.12)' }
+  };
+
+  var GROUPS = [
+    { name: '品牌色', rows: [
+      { v: '--main-color', label: '主色',  type: 'color' },
+      { v: '--sub-color',  label: '辅色',  type: 'color' }
+    ]},
+    { name: '表面', rows: [
+      { v: '--surface-1',  label: '卡片',     type: 'color' },
+      { v: '--surface-2',  label: '页面底',   type: 'color' },
+      { v: '--text-muted', label: '次要文字', type: 'color' }
+    ]},
+    { name: '圆角', rows: [
+      { v: '--radius-sm', label: '小',   type: 'range', min: 0, max: 24, unit: 'px' },
+      { v: '--radius-md', label: '中',   type: 'range', min: 0, max: 32, unit: 'px' },
+      { v: '--radius-lg', label: '大',   type: 'range', min: 0, max: 40, unit: 'px' },
+      { v: '--radius-xl', label: '特大', type: 'range', min: 0, max: 48, unit: 'px' }
+    ]},
+    { name: '动效', rows: [
+      { v: '--duration-1', label: '快',   type: 'range', min: 0, max: 400, step: 10, unit: 'ms' },
+      { v: '--duration-2', label: '中',   type: 'range', min: 0, max: 600, step: 10, unit: 'ms' },
+      { v: '--duration-3', label: '慢',   type: 'range', min: 0, max: 900, step: 10, unit: 'ms' },
+      { v: '--lift-hover', label: '悬停抬起', type: 'range', min: -14, max: 0, unit: 'px' }
+    ]}
+  ];
+
+  var overrides = {};
+  try { overrides = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { overrides = {}; }
+
+  function currentSkin() { return root.dataset.skin || 'modern'; }
+
+  // 读 token 当前值。已被覆盖的读覆盖值，否则读样式表算出来的值。
+  function read(name) {
+    if (overrides[name] != null) return overrides[name];
+    return getComputedStyle(root).getPropertyValue(name).trim();
+  }
+  function num(name) { return parseFloat(read(name)) || 0; }
+
+  // <input type="color"> 只吃 #rrggbb。表面色里可能有 rgba()/带 alpha 的十六进制，
+  // 用画布把任意颜色规范化成 6 位十六进制。
+  var probe = document.createElement('canvas').getContext('2d');
+  function toHex(css) {
+    if (/^#[0-9a-f]{6}$/i.test(css)) return css.toLowerCase();
+    try {
+      probe.fillStyle = '#000';
+      probe.fillStyle = css;
+      var out = probe.fillStyle;
+      if (/^#[0-9a-f]{6}$/i.test(out)) return out.toLowerCase();
+      var m = out.match(/rgba?\(([^)]+)\)/);
+      if (!m) return '#000000';
+      var p = m[1].split(',').map(parseFloat);
+      return '#' + p.slice(0, 3).map(function (c) {
+        return ('0' + Math.round(c).toString(16)).slice(-2);
+      }).join('');
+    } catch (e) { return '#000000'; }
+  }
+
+  function apply(name, value) {
+    overrides[name] = value;
+    root.style.setProperty(name, value);
+    save();
+  }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(overrides)); } catch (e) {}
+  }
+
+  // 重放已存的覆盖（含皮肤），这样翻页后状态还在。
+  function restore() {
+    if (overrides['data-skin']) root.dataset.skin = overrides['data-skin'];
+    Object.keys(overrides).forEach(function (k) {
+      if (k !== 'data-skin') root.style.setProperty(k, overrides[k]);
+    });
+  }
+  restore();
+
+  var body = document.getElementById('sdt-body');
+
+  function group(name) {
+    var g = document.createElement('div');
+    g.className = 'sdt-group';
+    var b = document.createElement('b'); b.textContent = name; g.appendChild(b);
+    body.appendChild(g);
+    return g;
+  }
+
+  // —— 皮肤切换 ——
+  var gSkin = group('皮肤');
+  var seg = document.createElement('div'); seg.className = 'sdt-seg';
+  ['modern', 'classic', 'darkroom', 'gallery', 'editorial'].forEach(function (s) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.textContent = s;
+    b.setAttribute('aria-pressed', String(currentSkin() === s));
+    b.addEventListener('click', function () {
+      root.dataset.skin = s;
+      overrides['data-skin'] = s; save();
+      seg.querySelectorAll('button').forEach(function (x) {
+        x.setAttribute('aria-pressed', String(x.textContent === s));
+      });
+      refresh(); // 换皮肤后各 token 的基准值变了，控件要跟着走
+    });
+    seg.appendChild(b);
+  });
+  gSkin.appendChild(seg);
+
+  // —— 各组控件 ——
+  var inputs = [];
+  GROUPS.forEach(function (grp) {
+    var g = group(grp.name);
+    grp.rows.forEach(function (row) {
+      var wrap = document.createElement('div'); wrap.className = 'sdt-row';
+      var lab = document.createElement('label'); lab.textContent = row.label;
+      var input = document.createElement('input');
+      var out = document.createElement('output');
+
+      if (row.type === 'color') {
+        input.type = 'color';
+        input.value = toHex(read(row.v));
+        out.textContent = '';
+        input.addEventListener('input', function () { apply(row.v, input.value); });
+      } else {
+        input.type = 'range';
+        input.min = row.min; input.max = row.max; input.step = row.step || 1;
+        input.value = num(row.v);
+        out.textContent = input.value + row.unit;
+        input.addEventListener('input', function () {
+          out.textContent = input.value + row.unit;
+          apply(row.v, input.value + row.unit);
+        });
+      }
+
+      lab.htmlFor = input.id = 'sdt-' + row.v.replace(/^--/, '');
+      wrap.appendChild(lab); wrap.appendChild(input); wrap.appendChild(out);
+      g.appendChild(wrap);
+      inputs.push({ row: row, input: input, out: out });
+    });
+  });
+
+  // —— 阴影预设 ——
+  var gSh = group('阴影');
+  var shRow = document.createElement('div'); shRow.className = 'sdt-row';
+  var shLab = document.createElement('label'); shLab.textContent = '强度';
+  var shadowSelect = document.createElement('select');
+  Object.keys(SHADOWS).forEach(function (k) {
+    var o = document.createElement('option'); o.value = k; o.textContent = k; shadowSelect.appendChild(o);
+  });
+  shadowSelect.addEventListener('change', function () {
+    var preset = SHADOWS[shadowSelect.value];
+    if (!preset) return;
+    Object.keys(preset).forEach(function (k) { apply(k, preset[k]); });
+  });
+  shRow.appendChild(shLab); shRow.appendChild(shadowSelect); shRow.appendChild(document.createElement('output'));
+  gSh.appendChild(shRow);
+
+  // 切皮肤 / 重置后，把控件拉回当前真实值
+  function refresh() {
+    inputs.forEach(function (it) {
+      if (it.row.type === 'color') {
+        it.input.value = toHex(read(it.row.v));
+      } else {
+        it.input.value = num(it.row.v);
+        it.out.textContent = it.input.value + it.row.unit;
+      }
+    });
+  }
+
+  // —— 导出 ——
+  document.getElementById('sdt-export').addEventListener('click', function (e) {
+    var keys = Object.keys(overrides).filter(function (k) { return k !== 'data-skin'; });
+    var btn = e.currentTarget;
+    if (!keys.length) { btn.textContent = '没有改动'; setTimeout(function(){ btn.textContent = '复制为 tokens.scss'; }, 1400); return; }
+    var sel = currentSkin();
+    var head = sel === 'modern' ? ':root {' : "[data-skin='" + sel + "'] {";
+    var css = head + '\n' + keys.sort().map(function (k) {
+      return '  ' + k + ': ' + overrides[k] + ';';
+    }).join('\n') + '\n}';
+    var done = function (ok) {
+      btn.textContent = ok ? '已复制 ✓' : '复制失败，见控制台';
+      if (!ok) console.log(css);
+      setTimeout(function () { btn.textContent = '复制为 tokens.scss'; }, 1600);
+    };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(css).then(function () { done(true); }, function () { done(false); });
+    } else { done(false); }
+  });
+
+  // —— 重置 ——
+  // 皮肤一起回到配置值。否则 localStorage 被清了、DOM 却还停在手动切过的皮肤上，
+  // 当前页和下次加载会显示成两个样子。
+  document.getElementById('sdt-reset').addEventListener('click', function () {
+    Object.keys(overrides).forEach(function (k) {
+      if (k !== 'data-skin') root.style.removeProperty(k);
+    });
+    overrides = {};
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    root.dataset.skin = DEFAULT_SKIN;
+    seg.querySelectorAll('button').forEach(function (x) {
+      x.setAttribute('aria-pressed', String(x.textContent === DEFAULT_SKIN));
+    });
+    refresh();
+    shadowSelect.value = '（不改）';
+  });
+
+  // —— 开关 ——
+  var box = document.getElementById('skin-devtool');
+  // 每次打开都重读一遍当前值。必须是打开时读、不能是构造时读：--main-color 由
+  // _partial/customize.ejs 定义，而它在 layout.ejs 里排在 after-footer 之后，
+  // 本脚本执行时那段 <style> 还没解析。顺带也能跟上暗色模式的切换。
+  function setOpen(v) { box.dataset.open = String(v); if (v) refresh(); }
+  document.getElementById('sdt-toggle').addEventListener('click', function () {
+    setOpen(box.dataset.open !== 'true');
+  });
+  document.getElementById('sdt-close').addEventListener('click', function () { setOpen(false); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') setOpen(false);
+  });
+})();
+</script>

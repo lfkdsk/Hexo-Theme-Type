@@ -1,11 +1,16 @@
 /** @format */
 
-$dark-bg-color: #121317;
-$dark-card-color: #1c1d20;
-$dark-card-elevated: #232428;
-$dark-title-color: #f3f4f6;
-$dark-subtitle-color: #b3b6bd;
-$dark-blue: #71afdd;
+// Dark surfaces now come from `tokens.scss` rather than being a second set of
+// hardcoded hexes. This file is only ever @imported inside
+// `@media (prefers-color-scheme: dark)` (see style.scss), so each token has
+// already resolved to its dark value here — and any skin that overrides them
+// gets a correct dark mode without touching this file.
+$dark-bg-color: var(--surface-2);
+$dark-card-color: var(--surface-1);
+$dark-card-elevated: var(--surface-muted);
+$dark-title-color: var(--text-strong);
+$dark-subtitle-color: var(--text-muted);
+$dark-blue: var(--main-color);
 $dark-green: #1db954;
 $dark-lightgreen: #49b683;
 $dark-yellow: #feda7a;
@@ -18,7 +23,7 @@ body,
 }
 
 .itp-float-bar {
-  background-color: rgba(28, 29, 32, 0.78) !important;
+  background-color: var(--surface-glass) !important;
 }
 
 .itp-float-bar a span {

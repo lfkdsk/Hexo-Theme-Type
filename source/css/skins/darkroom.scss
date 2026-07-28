@@ -1,0 +1,68 @@
+/** @format */
+
+@import '../_customize';
+
+//
+// `darkroom` 皮肤的结构性部分。
+//
+// 核心一招：把首页从"四列卡片墙"变成更密的接触样张（contact sheet）——大屏五列、
+// 间距压到 2px，整版照片几乎连成一片。这是暗房里看整卷底片的方式：先看全局关系，
+// 再挑单张。配合 --tile-dim: 0.32 的重压暗，鼠标指到哪张，哪张就从整版里"亮出来"。
+//
+// 栅格列数原本由 index.ejs 上的 Tailwind class 决定，这里直接用 CSS 覆盖，
+// 所以不用改模板就能换布局。
+//
+
+[data-skin='darkroom'] {
+  .gpro-container {
+    @media (min-width: 1024px) {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    @media (min-width: 1600px) {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+  }
+
+  // 压暗过渡放慢一点，接近眼睛适应暗环境的节奏
+  .gpro-tile {
+    transition: opacity var(--duration-3) var(--ease-out);
+  }
+
+  // 标题不用大块遮罩，改成底部一条窄压边，尽量不遮照片
+  .gpro-tile-descr {
+    justify-content: flex-end;
+    padding: 10px 12px;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 62%, var(--tile-scrim) 100%);
+
+    .text-xl {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    .text-sm {
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      opacity: 0.7;
+    }
+  }
+
+  // 标语收成一行安静的说明，不跟照片抢
+  .gpro-slogan {
+    max-width: 620px;
+    opacity: 0.75;
+  }
+
+  // 导航条在恒暗底上不需要毛玻璃的亮边
+  .itp-float-bar {
+    border-top-color: var(--border-subtle);
+    border-bottom-color: var(--border-subtle);
+  }
+}
+
+@media (max-width: 768px) {
+  [data-skin='darkroom'] .gpro-container {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

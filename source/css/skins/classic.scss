@@ -1,0 +1,230 @@
+/** @format */
+
+@import '../_customize';
+
+//
+// `classic` skin — the look this theme shipped before the token refactor.
+//
+// Only what a token VALUE can't express belongs here. Anything that is just a
+// different number or colour (radius, elevation, surfaces, motion, hover lift)
+// is handled by the `[data-skin='classic']` block in `tokens.scss`; this file
+// is for the handful of components whose *shape* differs.
+//
+// This stylesheet is always loaded, not swapped in — that's what makes the
+// switch work at runtime, so you can compare skins while designing:
+//
+//     document.documentElement.dataset.skin = 'classic'
+//
+// Deliberately NOT restored — these read as fixes rather than style, and stay
+// shared by both skins: dark-mode heading colours (classic got them via
+// `filter: invert(1) hue-rotate(180deg)`, which mangled every coloured child),
+// `:focus-visible` rings, and the flex-centred nav icons.
+//
+
+[data-skin='classic'] {
+  // ─── Index post entry ──────────────────────────────────────────────────
+  // Classic marked hover with a 2px accent border; modern lifts the card.
+  .itp-post-entry {
+    border-width: 2px;
+    box-shadow: none;
+  }
+
+  .itp-post-entry:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: var(--main-color);
+  }
+
+  // ─── Index pagination button ───────────────────────────────────────────
+  // Classic: flat slate rectangle. Modern: accent gradient pill.
+  .index-pagination {
+    .index-pagination-btn {
+      background: $deep-grey;
+      box-shadow: none;
+      font-weight: 400;
+      letter-spacing: normal;
+      max-width: 168px;
+      padding: 10px 60px;
+
+      @media screen and (max-width: 480px) {
+        padding: 10px 40px;
+      }
+
+      @media screen and (max-width: 320px) {
+        padding: 10px 20px;
+      }
+    }
+
+    .index-pagination-btn:hover {
+      transform: none;
+      filter: none;
+      box-shadow: 0 15px 25px 0 rgba(131, 131, 131, 0.35);
+    }
+
+    .index-pagination-btn:active {
+      transform: none;
+      filter: none;
+    }
+  }
+
+  // ─── Post entry cover (m3) ─────────────────────────────────────────────
+  // Classic cropped to a fixed height and never zoomed on hover.
+  .itp-m3-post-entry-cover {
+    aspect-ratio: auto;
+    transition: none;
+
+    @media screen and (min-width: 1022px) {
+      height: 322px;
+      max-height: none;
+    }
+
+    @media screen and (max-width: 1022px) {
+      height: 233px;
+      max-height: none;
+    }
+  }
+
+  .itp-m3-card-hover:hover .itp-m3-post-entry-cover {
+    transform: none;
+  }
+
+  // ─── Post entry typography ─────────────────────────────────────────────
+  .itp-m3-post-entry-info {
+    @media screen and (min-width: 1022px) {
+      padding: 42px 54px 54px 54px;
+
+      .title {
+        line-height: normal;
+      }
+    }
+
+    @media screen and (max-width: 1022px) {
+      padding: 28px 32px 32px 32px;
+
+      .title {
+        font-size: 24px;
+        line-height: normal;
+      }
+    }
+
+    .title,
+    .title a {
+      font-weight: 400;
+      letter-spacing: normal;
+    }
+
+    &:hover .title a {
+      color: $deep-grey;
+    }
+
+    .excerpt,
+    .meta {
+      line-height: 20px;
+    }
+
+    // Classic ran the date as plain body text, not an uppercase eyebrow.
+    .meta {
+      text-transform: none;
+      letter-spacing: normal;
+      font-size: 14px;
+      opacity: 1;
+    }
+
+    .category {
+      margin-top: 0;
+    }
+  }
+
+  // ─── Prev/next pagination cards ────────────────────────────────────────
+  .m3-index-pagination {
+    grid-template-columns: 46% 46%;
+    grid-column-gap: 8%;
+  }
+
+  .m3-pagination-card {
+    transition: none;
+
+    @media screen and (max-width: 600px) {
+      height: 66px;
+    }
+  }
+
+  .m3-pagination-card:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  // ─── Chips ─────────────────────────────────────────────────────────────
+  // Classic: solid fills at 80% opacity with white text on every variant.
+  // Modern: flat tinted pills that take their colour from the variant.
+  .itp-m3-chip-color-list .category-link,
+  .itp-m3-chip-color,
+  .itp-m3-chip-bold-list .category-link,
+  .itp-m3-chip-bold,
+  .itp-m3-chip-list .category-link,
+  .itp-m3-chip,
+  .itp-m3-chip-normal-list .tag-none-link,
+  .itp-m3-chip-normal {
+    color: #fff;
+    opacity: 0.8;
+    padding: 6px 12px;
+    margin: 4px;
+    font-size: 14px;
+    font-weight: 400;
+    border-color: transparent;
+    box-shadow: none;
+    transition: none;
+
+    a {
+      color: #fff;
+    }
+
+    &:hover {
+      transform: none;
+      box-shadow: none;
+    }
+  }
+
+  .itp-m3-chip-color,
+  .itp-m3-chip-color-list .category-link {
+    font-weight: 600;
+  }
+
+  .itp-m3-chip-bold,
+  .itp-m3-chip-bold-list .category-link {
+    background-color: #f4f4f4;
+    color: $deep-grey;
+    font-weight: 600;
+
+    a {
+      color: $deep-grey;
+    }
+
+    &:hover {
+      background-color: #f4f4f4;
+      color: $deep-grey;
+    }
+  }
+
+  .itp-m3-chip-normal,
+  .itp-m3-chip-normal-list .tag-none-link,
+  .itp-m3-chip {
+    background-color: #bababa;
+    color: #fff;
+
+    a {
+      color: #fff;
+    }
+
+    &:hover {
+      background-color: #bababa;
+      color: #fff;
+    }
+  }
+
+  // ─── Cover ─────────────────────────────────────────────────────────────
+  // Modern clips the cover so the rounded corners bite; classic let it bleed.
+  .itp-m3-cover {
+    overflow: visible;
+  }
+}
