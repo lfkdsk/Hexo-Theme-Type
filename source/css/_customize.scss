@@ -8,8 +8,8 @@ $black: var(--main-black);
 $grey: #767676;
 $deep-grey: #3D4350;
 $progress-color: #cccfd7;
-$gradient-main-color-opt: #71afddbe;
-$gradient-sub-color-opt: #66DED2be;
+$gradient-main-color-opt: color-mix(in srgb, var(--main-color) 75%, transparent);
+$gradient-sub-color-opt: color-mix(in srgb, var(--sub-color) 75%, transparent);
 
 // ─── Layout ────────────────────────────────────────────────────
 $content-width: 800px;

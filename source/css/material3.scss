@@ -356,7 +356,7 @@
 
   .itp-float-bar-item:hover,
   .itp-float-bar-item-max:hover {
-    background: rgba(113, 175, 221, 0.12);
+    background: color-mix(in srgb, var(--main-color) 12%, transparent);
     color: var(--main-color);
     cursor: pointer;
   }
@@ -545,9 +545,9 @@ li::marker {
   --waline-bgcolor: transparent;
   --waline-bgcolor-light: transparent;
   --waline-bgcolor-hover: transparent;
-  --waline-theme-color: #71afdd;
-  --waline-active-color: #71afdd;
-  --waline-badge-color: #71afdd;
+  --waline-theme-color: var(--main-color);
+  --waline-active-color: var(--main-color);
+  --waline-badge-color: var(--main-color);
   --waline-border-color: var(--border-subtle);
   --waline-border-radius: var(--radius-md);
 }

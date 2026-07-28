@@ -5,7 +5,7 @@
 //
 // `:root` carries the shipped skin. Every other skin is a block of value
 // overrides keyed on `[data-skin='…']` (written to <html> by layout.ejs from
-// `_config.type.yml` → `skin:`), so switching looks is one attribute — no
+// 主题配置的 `skin:`), so switching looks is one attribute — no
 // rebuild, no second branch. Both skins ship in this one stylesheet, which is
 // what lets you flip `document.documentElement.dataset.skin` live while
 // designing.
@@ -44,7 +44,7 @@
   --shadow-2: 0 4px 12px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.04);
   --shadow-3: 0 12px 28px rgba(15, 23, 42, 0.1), 0 4px 12px rgba(15, 23, 42, 0.05);
   --shadow-hover: 0 18px 40px rgba(15, 23, 42, 0.12), 0 6px 16px rgba(15, 23, 42, 0.06);
-  --shadow-focus: 0 0 0 3px rgba(113, 175, 221, 0.35);
+  --shadow-focus: 0 0 0 3px color-mix(in srgb, var(--main-color) 35%, transparent);
 
   // Motion
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
@@ -86,6 +86,9 @@
   --slogan-size-sm: 28px;
   --slogan-weight: 700;
   --slogan-tracking: -0.02em;
+
+  // 相册页主图的衬底——相框的"卡纸"。照片没铺满相框时露出的就是它。
+  --photo-mat: #000000;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -109,7 +112,7 @@
 // The look this theme shipped before the token refactor: uniform 5px corners,
 // tight double-blur shadows, MD-era greys. Kept switchable so a design change
 // can be A/B'd against the previous state instead of against a git branch.
-[data-skin='classic'] {
+:root[data-skin='classic'] {
   --radius-sm: 5px;
   --radius-md: 5px;
   --radius-lg: 5px;
@@ -143,12 +146,13 @@
 
   --page-pad: 16px;
   --tile-radius: 5px;
+  --photo-mat: #000000;
 }
 
 @media (prefers-color-scheme: dark) {
   // Must restate every colour the light `classic` block sets: media queries
   // carry no specificity, so the light block above would otherwise win here.
-  [data-skin='classic'] {
+  :root[data-skin='classic'] {
     --surface-1: #424242;
     --surface-2: #121212;
     --surface-muted: #4a4a4a;
@@ -164,7 +168,7 @@
 // 表面接近纯黑但不是纯黑（#0d0e10 留一点余量，纯黑会让 OLED 上的边界消失）。
 // 不用阴影：深底上的阴影不成立，靠发丝级暖灰边界分层。强调色取安全灯的琥珀。
 // 栅格间距压到 2px，接近印相接触样张——让整版照片连成一片。
-[data-skin='darkroom'] {
+:root[data-skin='darkroom'] {
   --surface-1: #14161a;
   --surface-2: #0d0e10;
   --surface-muted: #1c1f24;
@@ -180,7 +184,7 @@
   --shadow-2: none;
   --shadow-3: none;
   --shadow-hover: none;
-  --shadow-focus: 0 0 0 2px rgba(217, 149, 74, 0.55);
+  --shadow-focus: 0 0 0 2px color-mix(in srgb, var(--main-color) 55%, transparent);
 
   --radius-sm: 0px;
   --radius-md: 0px;
@@ -198,13 +202,14 @@
   --slogan-weight: 400;
   --slogan-tracking: 0.04em;
   --grid-max: 1600px;
+  --photo-mat: #000000;
 }
 
 // ─── gallery ───────────────────────────────────────────────────────────────
 // 画廊。美术馆的白盒子：大留白、零装饰、照片之间隔开足够远，让每张单独成立。
 // 底色用偏暖的纸白而不是冷白——冷白会和照片里的高光抢，纸白会退后。
 // 完全没有阴影和圆角，边界靠留白而不是描边。强调色是墨黑，除了照片没有颜色。
-[data-skin='gallery'] {
+:root[data-skin='gallery'] {
   --surface-1: #ffffff;
   --surface-2: #faf9f7;
   --surface-muted: #f2f0ec;
@@ -220,7 +225,7 @@
   --shadow-2: none;
   --shadow-3: none;
   --shadow-hover: none;
-  --shadow-focus: 0 0 0 2px rgba(28, 25, 20, 0.4);
+  --shadow-focus: 0 0 0 2px color-mix(in srgb, var(--main-color) 40%, transparent);
 
   --radius-sm: 0px;
   --radius-md: 0px;
@@ -240,11 +245,12 @@
   --slogan-size: 22px;
   --slogan-weight: 400;
   --slogan-tracking: 0.08em;
+  --photo-mat: #e8e4dc;
 }
 
 @media (prefers-color-scheme: dark) {
   // 画廊在暗色下改成"夜间闭馆"：墙面转深灰，纸白留给照片本身。
-  [data-skin='gallery'] {
+  :root[data-skin='gallery'] {
     --surface-1: #1a1917;
     --surface-2: #121110;
     --surface-muted: #232120;
@@ -260,7 +266,7 @@
 // ─── editorial ─────────────────────────────────────────────────────────────
 // 杂志。印刷排版的感觉：衬线大标题、米白纸底、墨黑正文、细分割线、锐角。
 // 间距尺度整体放大，让版面呼吸。适合配年度回顾这种文字多的页面。
-[data-skin='editorial'] {
+:root[data-skin='editorial'] {
   --surface-1: #fffdf8;
   --surface-2: #f6f1e7;
   --surface-muted: #ece5d7;
@@ -276,7 +282,7 @@
   --shadow-2: none;
   --shadow-3: 0 1px 0 rgba(40, 32, 20, 0.14);
   --shadow-hover: none;
-  --shadow-focus: 0 0 0 2px rgba(140, 47, 29, 0.4);
+  --shadow-focus: 0 0 0 2px color-mix(in srgb, var(--main-color) 40%, transparent);
 
   --radius-sm: 0px;
   --radius-md: 0px;
@@ -303,10 +309,11 @@
   --slogan-size-sm: 30px;
   --slogan-weight: 400;
   --slogan-tracking: -0.01em;
+  --photo-mat: #e2d9c9;
 }
 
 @media (prefers-color-scheme: dark) {
-  [data-skin='editorial'] {
+  :root[data-skin='editorial'] {
     --surface-1: #1c1a16;
     --surface-2: #141210;
     --surface-muted: #262320;

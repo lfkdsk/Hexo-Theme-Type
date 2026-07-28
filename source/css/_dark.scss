@@ -114,7 +114,7 @@ i.mdui-icon {
 
 .article a {
   color: #e7eaf0;
-  text-decoration-color: rgba(113, 175, 221, 0.55);
+  text-decoration-color: color-mix(in srgb, var(--main-color) 55%, transparent);
 }
 
 .article a:hover {
@@ -123,7 +123,7 @@ i.mdui-icon {
 }
 
 blockquote {
-  background: linear-gradient(180deg, rgba(113, 175, 221, 0.10), rgba(113, 175, 221, 0.03)) !important;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--main-color) 10%, transparent), color-mix(in srgb, var(--main-color) 3%, transparent)) !important;
   color: $dark-subtitle-color;
   p { color: $dark-subtitle-color; }
 }
