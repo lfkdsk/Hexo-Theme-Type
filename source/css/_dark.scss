@@ -102,14 +102,18 @@ i.mdui-icon {
   color: $dark-subtitle-color;
 }
 
-// Use explicit colors for headings instead of filter inversion (which broke colors and shadows)
-.article {
-  h1, h2, h3, h4, h5, h6 {
-    color: $dark-title-color !important;
-  }
-  h6 {
-    color: $dark-subtitle-color !important;
-  }
+// 暗色下的标题颜色。原先是 h1..h6 { filter: invert(1) hue-rotate(180deg) }——那个
+// hack 会把标题里的彩色子元素和阴影一并反掉，所以改成显式颜色是对的；但一度只
+// 作用在 .article 内，于是 .article 之外的标题（比如 grid-all 里的日期分节
+// .date-sec）在深色底上还是深色字，几乎看不见。这里放开到全局。
+//
+// 不加 !important：页面自己给标题定的颜色（如年度回顾页的渐变标题）应当能盖过它。
+h1, h2, h3, h4, h5, h6 {
+  color: $dark-title-color;
+}
+
+.article h6 {
+  color: $dark-subtitle-color !important;
 }
 
 .article a {

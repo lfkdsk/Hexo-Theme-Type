@@ -58,7 +58,7 @@ ORDER BY count DESC;
                 }
                 const a = document.createElement('a');
                 a.text = cell;
-                a.setAttribute('href', 'grid-all?maker=' + cell);
+                a.setAttribute('href', 'grid-all?maker=' + encodeURIComponent(String(cell).trim()));
                 return a;
             }, ...params.slice(1)],
         );
@@ -77,7 +77,7 @@ limit 10;
                 }
                 const a = document.createElement('a');
                 a.text = cell;
-                a.setAttribute('href', 'grid-all?lens_model=' + cell);
+                a.setAttribute('href', 'grid-all?lens_model=' + encodeURIComponent(String(cell).trim()));
                 return a;
             }, ...params.slice(1)],
         );
@@ -95,7 +95,7 @@ ORDER BY COUNT(*) DESC;
                 }
                 const a = document.createElement('a');
                 a.text = cell;
-                a.setAttribute('href', 'grid-all?country=' + cell);
+                a.setAttribute('href', 'grid-all?country=' + encodeURIComponent(String(cell).trim()));
                 return a;
             }, ...params.slice(1)],
         );
@@ -116,7 +116,7 @@ LIMIT 5;
                 }
                 const a = document.createElement('a');
                 a.text = cell;
-                a.setAttribute('href', 'grid-all?focal_length=' + cell);
+                a.setAttribute('href', 'grid-all?focal_length=' + encodeURIComponent(String(cell).trim()));
                 return a;
             }, ...params.slice(1)],
         );

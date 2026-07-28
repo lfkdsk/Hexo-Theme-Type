@@ -89,6 +89,20 @@
 
   // 相册页主图的衬底——相框的"卡纸"。照片没铺满相框时露出的就是它。
   --photo-mat: #000000;
+
+  // ── 年度回顾页 ──────────────────────────────────────────────────────────
+  // 这一页是刻意区别于全站的沉浸式设计（满屏深色画布 + 招牌渐变 + 毛玻璃卡片），
+  // 所以给它一套自己的调色，而不是硬塞进通用的 surface/text 里——否则它要么
+  // 失去性格，要么反过来把通用 token 拖成为它服务的样子。皮肤重新诠释这套语言。
+  --recap-bg: #000000;
+  --recap-bg-2: #1a1a1a;      // 首屏渐变的落点
+  --recap-fg: #ffffff;
+  --recap-fg-soft: rgba(255, 255, 255, 0.9);
+  --recap-fg-dim: rgba(255, 255, 255, 0.8);
+  --recap-card: rgba(255, 255, 255, 0.05); // 毛玻璃卡片
+  --recap-accent: #007aff;    // 招牌渐变的起止色，用在大数字和顶部进度条
+  --recap-accent-2: #ff2d55;
+  --recap-scrim: rgba(0, 0, 0, 0.8); // 压在照片上的遮罩，与画布明暗无关
 }
 
 @media (prefers-color-scheme: dark) {
@@ -203,6 +217,15 @@
   --slogan-tracking: 0.04em;
   --grid-max: 1600px;
   --photo-mat: #000000;
+  // 年度回顾：暗房的琥珀取代 iOS 蓝粉，画布压到与全站一致的近黑
+  --recap-bg: #0d0e10;
+  --recap-bg-2: #16181c;
+  --recap-fg: #ede8e0;
+  --recap-fg-soft: rgba(237, 232, 224, 0.9);
+  --recap-fg-dim: rgba(237, 232, 224, 0.72);
+  --recap-card: rgba(255, 240, 220, 0.05);
+  --recap-accent: #d9954a;
+  --recap-accent-2: #8c5a2b;
 }
 
 // ─── gallery ───────────────────────────────────────────────────────────────
@@ -246,6 +269,15 @@
   --slogan-weight: 400;
   --slogan-tracking: 0.08em;
   --photo-mat: #e8e4dc;
+  // 年度回顾：画廊连这一页也翻成纸白，招牌渐变收成单一墨色——除了照片没有颜色
+  --recap-bg: #faf9f7;
+  --recap-bg-2: #f2f0ec;
+  --recap-fg: #1c1914;
+  --recap-fg-soft: rgba(28, 25, 20, 0.9);
+  --recap-fg-dim: rgba(28, 25, 20, 0.65);
+  --recap-card: rgba(28, 25, 20, 0.05);
+  --recap-accent: #1c1914;
+  --recap-accent-2: #7d766c;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -310,6 +342,15 @@
   --slogan-weight: 400;
   --slogan-tracking: -0.01em;
   --photo-mat: #e2d9c9;
+  // 年度回顾：米白纸底配赭红，最适合这一页的大段文字与数字
+  --recap-bg: #f6f1e7;
+  --recap-bg-2: #ece5d7;
+  --recap-fg: #1a1613;
+  --recap-fg-soft: rgba(26, 22, 19, 0.9);
+  --recap-fg-dim: rgba(26, 22, 19, 0.65);
+  --recap-card: rgba(40, 32, 20, 0.06);
+  --recap-accent: #8c2f1d;
+  --recap-accent-2: #b5723a;
 }
 
 @media (prefers-color-scheme: dark) {
