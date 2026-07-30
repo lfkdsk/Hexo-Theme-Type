@@ -50,8 +50,12 @@ schemes: m3
 # gallery 仓库可以用 CONFIG.yml 的 theme_config: { skin: … } 覆盖这里。
 skin: modern
 
-# 皮肤调试面板。开了会在右下角出现一个悬浮按钮，可以实时切皮肤、拖动调 token，
-# 并把结果导出成能直接粘回 source/css/tokens.scss 的代码。默认关，线上访客看不到。
+# 皮肤调试面板：按 Shift+D 随时唤出，可实时切皮肤、拖动调 token，并把结果导出成
+# 能直接粘回 source/css/tokens.scss 的代码。不需要配置就能用——面板本体在首次
+# 按键时才加载，访客既发现不了快捷键、也不会为它付下载成本。
+#
+# 这一项只决定要不要额外显示右下角那个 🎨 浮标按钮。平时用快捷键就够了，
+# 想给别人演示、或者在触屏设备上（没有键盘）才需要打开。
 skin_devtool: false
 
 # Fonts

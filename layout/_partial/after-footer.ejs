@@ -89,6 +89,6 @@
   }
 </script>
 <% } %>
-<% if (theme.skin_devtool) { %>
+<%# 皮肤调试面板的常驻加载器。无条件渲染——它只有重放覆盖和监听 Shift+D 两件事，
+    面板本体按键时才拉。skin_devtool 现在只决定要不要显示那个 🎨 浮标。 %>
 <%- partial("_partial/skin-devtool") %>
-<% } %>
