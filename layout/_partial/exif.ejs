@@ -14,9 +14,7 @@
             </div>
             <div style="margin-left: 10px; width: 1px; background-color: black;"></div>
             <div id="exif-text" style="padding-left: 10px; position: relative;">
-                <%# gap 取代原来靠行高撑出来的行距，配合上面 line-height: 1.15，
-                    让行盒贴合字形、几何居中≈视觉居中。详见样式块里的说明。 %>
-                <div style="display: flex; flex-direction: column; justify-content: center; gap: 3px;">
+                <div style="display: flex; flex-direction: column; justify-content: center;">
                     <div id="exif-maker"></div>
                     <div id="exif-lens"></div>
                     <div id="exif-author"></div>
@@ -60,19 +58,6 @@
         font-weight: lighter;
         color: gray;
         font-size: 80%;
-    }
-
-    /* 右栏三行的纵向居中。原来靠默认行高（1.5）撑开行距，但字形在行盒里并不居中：
-       首行「机身型号」一般没有下伸字母，上方留着一段 ascent 余量；末行「By xxx」的
-       y/j 却顶到行盒底部。于是盒子对称、目视却是上方空一截。
-
-       行高改成贴合字形、行距用 gap 显式给之后，行盒边界≈墨迹边界，父容器的
-       justify-content: center 得到的几何居中就约等于视觉居中——不依赖具体字体的
-       ascent/descent 比例，也不用写死一个偏移量。 */
-    #exif-maker,
-    #exif-lens,
-    #exif-author {
-        line-height: 1.15;
     }
 
     #exif-lens {
