@@ -100,6 +100,16 @@ ORDER BY random() LIMIT 1;`
             // 尽量铺满可用空间。
             if (widget !== null && widget === "true") {
                 document.documentElement.classList.add('is-widget');
+                // 相框衬底改成白的。#imgbox 是 object-fit: contain，竖构图时左右
+                // （横构图时上下）会露出后面的 .pic-item——站内它是黑的，看照片时
+                // 黑衬底最不干扰；但嵌到小组件里四周是白的，这块黑就成了突兀的色块。
+                //
+                // 这里用内联 !important 而不是 CSS 规则：single-photo.ejs 里那个
+                // <div id="pic-g" class="pic-item" /> 是自闭合写法，HTML 不认，
+                // 解析出来的 DOM 结构跟源码不一致，页面内 <style> 甚至没进
+                // document.styleSheets，普通 CSS 规则压不住它。内联最高优先级最稳。
+                var mat = document.getElementById('pic-g');
+                if (mat) mat.style.setProperty('background-color', '#fff', 'important');
             }
             download.click(function () {
                 var node = document.getElementById('all-pic');

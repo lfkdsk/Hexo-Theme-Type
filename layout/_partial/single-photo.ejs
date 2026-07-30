@@ -79,6 +79,14 @@
         padding: 0 !important;
     }
 
+    /* 相框的衬底。#imgbox 是 object-fit: contain，竖构图时左右（横构图时上下）
+       会露出后面的 .pic-item —— 站内它是黑的，看照片时黑衬底最不干扰。
+       但嵌到小组件里，四周是白的，这块黑就成了一整片突兀的色块，
+       所以嵌入模式下让它跟着白底走。 */
+    .is-widget .pic-item {
+        background-color: #fff !important;
+    }
+
     .is-widget .itp-float-bar,
     .is-widget .itp-footer,
     .is-widget .itp-nav-sheet,
