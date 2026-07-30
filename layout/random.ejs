@@ -93,9 +93,13 @@ ORDER BY random() LIMIT 1;`
             nextImage();           
             const widget = getParam("widget");
             const daily = getParam("daily");
+            // widget=true 是给嵌入用的（iframe / 小挂件）。这种场景里页面外框的
+            // 留白全是多余的：.content-area 的 margin-top: 80px 本是给固定导航条
+            // 让位，而嵌入时根本不该有导航条占位；相框自己那份上下 padding 同理。
+            // 原来这里反而又加了 60/70px，照片上下留出大片死白。一律归零，让照片
+            // 尽量铺满可用空间。
             if (widget !== null && widget === "true") {
-                var node = $('#all-pic');
-                node.attr('style', 'padding-top: 60px; padding-bottom:70px')
+                document.documentElement.classList.add('is-widget');
             }
             download.click(function () {
                 var node = document.getElementById('all-pic');
