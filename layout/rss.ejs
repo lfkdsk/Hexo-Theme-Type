@@ -8,16 +8,26 @@
             <userId><%= config.follow_challenge.userId %></userId>
         </follow_challenge>
         <% } %>
-        <lastBuildDate><%= new Date().toGMTString() %></lastBuildDate>
         <description><%= config.description %></description>
-        <% const albums = site.pages.filter(i => i.layout === 'album') %>
-        <%
-        albums.sort(function(a,b){
-            // Turn your strings into dates, and then subtract them
-            // to get a value that is either negative, positive, or zero.
-            return new Date(b.date) - new Date(a.date);
-          });
+        <%#
+          排序原来是坏的，两个原因叠在一起：
+          1) warehouse 的 Query.sort(orderby, order) 要的是字段名（'-date'）或
+             {date:-1} 这样的对象，传比较函数会被 parseArgs 当成 orderby 对象，
+             排序根本不生效（见 node_modules/warehouse/lib/util.js:177）；
+          2) 它返回新 Query、不原地修改，原写法还把返回值丢掉了。
+          结果 first() 取到的是 hexo 内部顺序的第一条，而那个顺序在冷构建之间
+          并不稳定 —— <updated> 每次构建都可能指向不同的相册，凭空产生空提交。
         %>
+        <%#
+          次级键 +url 不能省：README.yml 里有 7 个日期各对应 2 个相册，只按 date
+          排序时这些并列项的先后由 hexo 的内部顺序决定，而那个顺序在冷构建之间
+          不稳定（CI 上没有 db.json 缓存，每次都是冷构建）。于是同样的内容会生成
+          条目顺序不同的 rss.html，凭空产生 diff。url 唯一，用它兜底即可确定。
+        %>
+        <% const albums = site.pages.filter(i => i.layout === 'album').sort('-date +url'); %>
+        <%# lastBuildDate 取最新相册的日期，不用 new Date()。后者在每日 cron 下
+            每次都变，即使相册内容一个字没动，也会在 gh-pages 上堆出纯时间戳的空提交。 %>
+        <lastBuildDate><%= albums.first().date.utc().format('ddd, DD MMM YYYY HH:mm:ss') %> GMT</lastBuildDate>
         <language><%= config.language %></language>
         <updated><%= albums.first().date.toISOString() %></updated>
         <% for (var post of albums.data) { %>
