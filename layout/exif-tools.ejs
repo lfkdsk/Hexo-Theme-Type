@@ -275,14 +275,13 @@
             });
 
             $("#downloadbox").click(function () {
-                var node = document.getElementById('all-pic');
-                html2canvas(node, {
-                    useCORS: true,
-                    allowTaint: true,
-                    scrollX: 0,
-                    scrollY: 0,
-                }).then(function (canvas) {
-                    simulateDownloadImageClick(canvas.toDataURL('image/png'), currentFilename + '.png');
+                // 这一页的图是用户本地上传的，<img> 里已是原始像素，
+                // 没有远端原图可换，所以不传 fullSrc。
+                downloadFramedPhoto({
+                    node: document.getElementById('all-pic'),
+                    img: document.getElementById('imgbox'),
+                    filename: currentFilename,
+                    button: this,
                 });
             });
 

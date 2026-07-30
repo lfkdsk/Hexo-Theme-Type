@@ -47,6 +47,100 @@ function copyToClipboard(content) {
   }
 }
 
+/**
+ * 把「相框 + 照片 + EXIF 卡」这一整块渲染成一张可下载的图片。
+ *
+ * 为什么不直接 html2canvas(node)（原来的做法）：它的输出尺寸就是节点在屏幕上的
+ * 显示尺寸 × devicePixelRatio。实测一张 12480×8320（104 MP）的原图，下载下来只有
+ * 1736×1298（2.3 MP）—— 只剩 2.2% 的像素，而且窗口越小下载的图越糊。
+ *
+ * 两步解决：
+ *   1) 先把 <img> 的 src 换成原图，让画布里那块像素是全分辨率的；
+ *   2) scale 用「目标长边 / 节点当前宽度」反算，让输出尺寸与窗口大小无关。
+ *
+ * 为什么仍然用 html2canvas 而不是自己在 canvas 上画：EXIF 卡的排版（左侧参数与
+ * 日期、右侧厂商 logo 加机身镜头作者）全在 CSS 里。自己重画一遍等于让同一个设计
+ * 有两份实现，以后改 CSS 还得记着同步改 JS，迟早漂移。这里只借它 DOM→canvas 的
+ * 能力，排版仍然是 CSS 单一来源。
+ *
+ * maxEdge 默认 4000：A3 打印约需 3500px，分享用绰绰有余。再往上时间和内存都按
+ * 平方增长（4000px 已需约 3 秒），不值得。
+ *
+ * @param {Object}      o
+ * @param {HTMLElement} o.node      要渲染的节点（通常是 #all-pic）
+ * @param {HTMLImageElement} o.img  节点里的主图元素
+ * @param {string}     [o.fullSrc]  原图 URL；省略则用 img 当前的 src
+ *                                  （exif-tools 页是本地上传的图，没有远端原图）
+ * @param {string}      o.filename  下载文件名，不含扩展名
+ * @param {Element}    [o.button]   触发按钮，用于显示生成中状态
+ * @param {number}     [o.maxEdge]  输出长边上限
+ */
+async function downloadFramedPhoto(o) {
+  var node = o.node;
+  var img = o.img;
+  var maxEdge = o.maxEdge || 4000;
+  var btn = o.button && o.button.jquery ? o.button[0] : o.button;
+  var btnText = btn ? btn.textContent : null;
+  var originalSrc = img ? img.src : null;
+  var objectUrl = null;
+
+  if (btn) {
+    btn.textContent = " 生成中… ";
+    btn.style.pointerEvents = "none";
+    btn.style.opacity = "0.6";
+  }
+
+  try {
+    // 换成原图。先用一个临时 Image 预加载，确认可解码再替换 —— 直接改 src 的话
+    // 万一原图 404，主图会当场变成破图。
+    if (o.fullSrc && img && o.fullSrc !== originalSrc) {
+      await new Promise(function (resolve, reject) {
+        var probe = new Image();
+        probe.crossOrigin = "anonymous";
+        probe.onload = function () { resolve(); };
+        probe.onerror = function () { reject(new Error("原图加载失败: " + o.fullSrc)); };
+        probe.src = o.fullSrc;
+      });
+      img.src = o.fullSrc;
+      if (img.decode) { try { await img.decode(); } catch (e) { /* 解码失败就按原样继续 */ } }
+    }
+
+    var cssW = node.offsetWidth;
+    var cssH = node.offsetHeight;
+    var scale = maxEdge / Math.max(cssW, cssH);
+    if (scale < 1) scale = 1; // 节点本身就比目标大时不缩小
+
+    var canvas = await html2canvas(node, {
+      useCORS: true,
+      scale: scale,
+      scrollX: 0,
+      scrollY: 0,
+      backgroundColor: null,
+    });
+
+    // toBlob 而不是 toDataURL：后者会先生成一个几 MB 的 base64 字符串，白占内存。
+    var blob = await new Promise(function (resolve) {
+      canvas.toBlob(resolve, "image/jpeg", 0.92);
+    });
+    if (!blob) throw new Error("canvas.toBlob 返回空");
+
+    objectUrl = URL.createObjectURL(blob);
+    simulateDownloadImageClick(objectUrl, o.filename + ".jpg");
+  } catch (e) {
+    console.error("下载图片生成失败:", e);
+    if (typeof toastr !== "undefined") toastr.error("图片生成失败，请重试");
+  } finally {
+    if (originalSrc && img && img.src !== originalSrc) img.src = originalSrc;
+    if (btn) {
+      btn.textContent = btnText;
+      btn.style.pointerEvents = "";
+      btn.style.opacity = "";
+    }
+    // 给下载动作留出时间再释放，否则 Safari 上偶发拿不到内容
+    if (objectUrl) setTimeout(function () { URL.revokeObjectURL(objectUrl); }, 60000);
+  }
+}
+
 function simulateDownloadImageClick(uri, filename) {
   var link = document.createElement("a");
   link.setAttribute("class", "screenshot");
