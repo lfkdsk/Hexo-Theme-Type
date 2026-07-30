@@ -1,5 +1,4 @@
 <script src="js/sql-wasm.js"></script>
-<script src="js/html2canvas.min.js" defer></script>
 <section class="pjax-area">
     <%- include('_partial/single-photo.ejs') %>
         <script type="module">
@@ -98,17 +97,14 @@ ORDER BY random() LIMIT 1;`
                 node.attr('style', 'padding-top: 60px; padding-bottom:70px')
             }
             download.click(function () {
-                var node = document.getElementById('all-pic');
-                html2canvas(node, {
-                    useCORS: true,
-                    allowTaint: true,
-                    scrollX: 0,
-                    scrollY: 0,
-                }).then(function (canvas) {
-                    if (daily !== null && daily === "true") {
-                        name = "download"
-                    }                       
-                    simulateDownloadImageClick(canvas.toDataURL('image/png'),  name + '.png');
+                // daily 模式下固定文件名，保持原行为
+                if (daily !== null && daily === "true") name = "download";
+                downloadFramedPhoto({
+                    node: document.getElementById('all-pic'),
+                    img: document.getElementById('imgbox'),
+                    fullSrc: imgLink,
+                    filename: name,
+                    button: this,
                 });
             });
         </script>

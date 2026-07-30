@@ -1,6 +1,5 @@
 <script src="js/mini-live-photo.js"></script>
 <script src="js/sql-wasm.js"></script>
-<script src="js/html2canvas.min.js" defer></script>
 <section class="pjax-area">
     <%- include('_partial/single-photo.ejs') %>
         <script type="module">
@@ -26,14 +25,12 @@
             $("#copybox").hide();
             $("#nextbox").hide();
             $("#downloadbox").click(function () {
-                var node = document.getElementById('all-pic');
-                html2canvas(node, {
-                    useCORS: true,
-                    allowTaint: true,
-                    scrollX: 0,
-                    scrollY: 0,
-                }).then(function (canvas) {
-                    simulateDownloadImageClick(canvas.toDataURL('image/png'), name + '.png');
+                downloadFramedPhoto({
+                    node: document.getElementById('all-pic'),
+                    img: document.getElementById('imgbox'),
+                    fullSrc: imgLink,
+                    filename: name,
+                    button: this,
                 });
             });
             const SQL = await initSqlJs({

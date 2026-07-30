@@ -1,4 +1,3 @@
-<script src="js/html2canvas.min.js" defer></script>
 <script src="js/mini-live-photo.js"></script>
 <section class="pjax-area">
   <div class="content-area post-album <%- page.style %>-content-area">
@@ -217,14 +216,12 @@
         }
 
         $('#download').click(function () {
-          var node = document.getElementById('all-pic');
-          html2canvas(node, {
-            useCORS: true,
-            allowTaint: true,
-            scrollX: 0,
-            scrollY: 0,
-          }).then(function (canvas) {
-            simulateDownloadImageClick(canvas.toDataURL('image/png'),  name + '.png');
+          downloadFramedPhoto({
+            node: document.getElementById('all-pic'),
+            img: imageBox,
+            fullSrc: imgLink,      // 当前选中照片的原图，不是缩略图
+            filename: name,
+            button: this,
           });
         });
         // key
