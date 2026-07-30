@@ -1,3 +1,6 @@
+/** @format */
+
+// ─── Brand colors ──────────────────────────────────────────────
 $main-color: var(--main-color);
 $sub-color: var(--sub-color);
 $bg-color: #f5f5f5;
@@ -5,11 +8,16 @@ $black: var(--main-black);
 $grey: #767676;
 $deep-grey: #3D4350;
 $progress-color: #cccfd7;
-$gradient-main-color-opt: #71afddbe;
-$gradient-sub-color-opt: #66DED2be;
+$gradient-main-color-opt: color-mix(in srgb, var(--main-color) 75%, transparent);
+$gradient-sub-color-opt: color-mix(in srgb, var(--sub-color) 75%, transparent);
+
+// ─── Layout ────────────────────────────────────────────────────
 $content-width: 800px;
 $toggle_desktop: 1022px;
 $toggle_tablet: 800px;
-:root {
-  --radius: 5px;
-}
+
+// Design tokens (radius / spacing / elevation / motion / surfaces) live in
+// `tokens.scss`, which compiles to its own stylesheet and is loaded once per
+// page. They are deliberately NOT imported here: this file is @imported by
+// several entry points, so emitting `:root` from it would duplicate the whole
+// token set in every compiled sheet. Consume them as `var(--…)`.

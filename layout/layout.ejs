@@ -7,7 +7,9 @@
 <% } else { %>
 
 <!DOCTYPE html>
-<html lang="<%= config.language ? config.language : 'en' %>">
+<%# data-skin 选中 css/tokens.scss 里的一套设计令牌。取值来自主题配置的 skin:，
+    gallery 仓库可用 CONFIG.yml 的 theme_config: { skin: … } 覆盖（hexo 会 deep-merge）。 %>
+<html lang="<%= config.language ? config.language : 'en' %>" data-skin="<%= theme.skin || 'modern' %>">
 <!-- Head tag -->
 <%- partial('_partial/head') %>
 <% if(page.layout==='layout' ) { %>

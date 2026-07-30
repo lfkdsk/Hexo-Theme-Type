@@ -6,7 +6,7 @@
       <div class="<%- page.style %>-pic gap-2 wrapper">
         <div id="all-pic" class="pic-area">
           <div id="pic-g" class="pic-item" />
-          <img id="imgbox" class="pic-box nofancy" src="<%- page.photos[0].thum %>" />
+          <img id="imgbox" class="pic-box nofancy" src="<%- page.photos[0].thum %>" alt="" decoding="async" fetchpriority="high" />
         </div>
         <%- include('_partial/exif.ejs') %>
       </div>
@@ -33,14 +33,15 @@
           <% var desc = extra0.desc %>
           <% var extra = JSON.parse(JSON.stringify(extra0)); %>
           <% extra.desc = null %>
-          <a class="album-item lazy" id="<%- i %>"
+          <a class="album-item" id="<%- i %>"
             name="<%- name %>" rel="<%- url %>"
             desc="<%- desc %>"
             share="<%- share %>"
             video="<%- video %>"
             extra='<%- JSON.stringify(extra) %>'
             href="javascript:void(0);" onClick="changeimg(event)" data-src="<%- thum %>"
-            aria-label="the photo <%- i %>"></a>
+            aria-label="the photo <%- i %>"><img class="nofancy" src="<%- thum %>" alt=""
+              loading="<%= i < 8 ? 'eager' : 'lazy' %>" decoding="async"></a>
           <% } %>
       </div>
       <div class="text-center text-xs pt-2 hint-text"> </div>
@@ -58,9 +59,6 @@
           </div>
           <div class="album-share album-tool">
             <iconpark-icon name="down-picture"></iconpark-icon><a id="download" href="javascript:void(0)"> Download </a>
-          </div>
-          <div class="album-share album-tool">
-            <iconpark-icon name="save"></iconpark-icon><a id="editor" href="javascript:void(0)"> Editor </a>
           </div>
           <div class="album-share album-tool">
             <iconpark-icon name="grid-nine"></iconpark-icon><a id="grid" href="javascript:void(0)"> Grid </a>
@@ -104,7 +102,6 @@
         var normalWrapper = $("#normal-wrapper");
         var normalData = $("#no-exif-data");
         var name = getParam('name');
-        var editor = $("#editor");
         imgno = 0;
         imgLink = imageBox.src;
         // Monotonic token: guards against a slow earlier high-res load finishing
@@ -230,9 +227,6 @@
             simulateDownloadImageClick(canvas.toDataURL('image/png'),  name + '.png');
           });
         });
-        editor.click(function () {
-          window.open('<%- config.url %>/editor?file=' + encodeURIComponent(imgLink));
-        })
         // key
         window.onkeydown = function album_hotkey() {
           //[键盘快捷键] 左箭头 上一张
@@ -331,7 +325,7 @@
       </script>
       <style>
         body {
-          background-color: #fff;
+          background-color: var(--surface-2);
         }
 
         .fullscreen-pic {
@@ -358,7 +352,7 @@
         }
 
         .pic-item {
-          background-color: black;
+          background-color: var(--photo-mat);
           background-size: cover;
           background-position: center;
           transition: all .1s ease-in-out;
@@ -414,7 +408,7 @@
         .album-tool {
           display: inline-flex;
           font-size: .8em;
-          color: #71afdd;
+          color: var(--main-color);
           gap: 4px;
           padding-bottom: 4px;
         }
@@ -425,14 +419,30 @@
         }
 
         .album-item {
-          background-color: black;
+          background-color: var(--surface-2);
           aspect-ratio: 1 / 1;
-          border: 0.8px solid black;
-          border-radius: 2px;
-          min-height: 100px;
-          min-width: 100px;
-          background-size: cover;
-          background-position: center;
+          border: 0.8px solid var(--border-subtle);
+          border-radius: var(--tile-radius);
+          /* 尺寸必须写死。以前 .album-item 是个空 <a>（背景图不产生内容尺寸），
+             靠 min-width 就能收成小方块；现在里面装了张 1000px 的缩略图，
+             flex 基准尺寸会变成 1000px，不写死就会把整条缩略图带撑爆。 */
+          width: 100px;
+          height: 100px;
+          flex: 0 0 auto;
+          position: relative;
+          overflow: hidden;
+        }
+
+        /* 缩略图改用真 <img>（原来是 lazyload.js 往 <a> 上刷 background-image），
+           好处是走浏览器原生的 loading/decoding。pointer-events: none 让点击穿透到
+           外层 <a>——changeimg() 读的是 event.target 上的 data-src，不穿透就点不动了；
+           顺带也禁掉了缩略图被拖走的默认行为。 */
+        .album-item img {
+          display: block;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          pointer-events: none;
         }
 
         @media (max-width: 768px) {
@@ -530,15 +540,15 @@
           }
 
           .pic-item {
-            background-color: black;
+            background-color: var(--photo-mat);
           }
 
           .album-item {
-            background-color: black;
+            background-color: var(--photo-mat);
           }
 
           .album-item {
-            border: 0.8px solid white;
+            border: 0.8px solid var(--border-subtle);
           }
         }
 

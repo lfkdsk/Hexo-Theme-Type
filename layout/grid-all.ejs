@@ -44,6 +44,38 @@
             observer.observe(sentinel);
         }
         function fetchData() {
+            // 筛选条件收集成数组再用 AND 拼接、值走参数绑定。原来每个条件各自带一个
+            // WHERE 直接串起来，同时传两个筛选（如 ?maker=X&country=Y）会拼出
+            // `WHERE … WHERE …` 这种非法 SQL；值也是裸拼进双引号里，厂商名里只要
+            // 有引号整条查询就废（RICOH 那条 EXIF 还带尾随空格，故用 TRIM 比较）。
+            var conds = [];
+            var binds = [];
+            if (album !== null) {
+                conds.push('Photo.dir_id = (SELECT Album.id FROM Album WHERE Album.dir = ?)');
+                binds.push(album);
+            }
+            if (maker !== null && maker !== "NONE") {
+                conds.push('TRIM(EXIFData.maker) = ?');
+                binds.push(maker.trim());
+            }
+            if (maker !== null && maker === "NONE") {
+                conds.push('EXIFData.maker IS NULL');
+            }
+            if (lens_model !== null) {
+                conds.push('TRIM(EXIFData.lens_model) = ?');
+                binds.push(lens_model.trim());
+            }
+            if (focal_length !== null) {
+                conds.push('TRIM(EXIFData.focal_length) = ?');
+                binds.push(focal_length.trim());
+            }
+            if (country !== null && country !== "NONE") {
+                conds.push('Location.country = ?');
+                binds.push(country.trim());
+            }
+            if (country !== null && country === "NONE") {
+                conds.push("Location.country = ''");
+            }
             var result = db.exec(
                 `
 SELECT
@@ -54,13 +86,7 @@ FROM
 LEFT JOIN
     EXIFData ON Photo.exif_data_id = EXIFData.id` 
     + ((country !== null) ? ' LEFT JOIN Location ON Photo.location_id = Location.id ' : ' ')
-    + (album !== null ? ' WHERE Photo.dir_id = (SELECT Album.id FROM Album WHERE Album.dir = "' + album + '")' : ' ')                
-    + ((maker !== null && maker !== "NONE") ? ' WHERE EXIFData.maker = "' + maker + '"' : ' ')                
-    + ((maker !== null && maker === "NONE") ? ' WHERE EXIFData.maker IS NULL ': '')                
-    + ((lens_model !== null) ? ' WHERE EXIFData.lens_model = "' + lens_model + '"' : ' ')                
-    + ((focal_length !== null) ? ' WHERE EXIFData.focal_length = "' + focal_length + '"' : ' ')                
-    + ((country !== null && country !== "NONE") ? ' WHERE Location.country = "' + country + '"' : ' ')                
-    + ((country !== null && country === "NONE") ? ' WHERE Location.country = "" ' : ' ')                    
+    + (conds.length ? ' WHERE ' + conds.join(' AND ') + ' ' : ' ')
     +
 `GROUP BY
     photo_date
@@ -68,7 +94,7 @@ ORDER BY
     photo_date ` 
     + (album !== null ? ' ASC ' : ' DESC ')
     + (loadAll ? ';' : (`LIMIT ` + pageSize + ' OFFSET ' + (page - 1) * pageSize + ";"))
-            );
+            , binds);
             if (result.length === 0) {
                 return;
             }
