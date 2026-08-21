@@ -1223,9 +1223,28 @@
                 const lat = extra?.gpsLat ?? p.loc?.lat;
                 const lon = extra?.gpsLon ?? p.loc?.lon;
                 const alt = extra?.gpsAlt;
-                const latN = Number(lat);
-                const lonN = Number(lon);
-                const hasLoc = Number.isFinite(latN) && Number.isFinite(lonN);
+
+                // 没有 GPS 的照片在库里 Location 是 NULL（tool.py 的 to_location
+                // 对空数据直接返回 None），SQL 取出来就是 null —— 而
+                // Number(null) === 0 且 Number.isFinite(0) 为真，所以原来的判断
+                // 把「没有位置」当成 (0, 0) 放行了，渲染出 0.00000°N /
+                // 0.00000°E、海拔 0.0000m，以及一个指向几内亚湾的地图链接。
+                //
+                // 所以先把空值挡在 Number() 之前，再排掉 Null Island：相机没定
+                // 到位时也会把 0/0 写进 EXIF，那同样是「没有」，不是真的有人站
+                // 在赤道和本初子午线的交点上拍照。顺带做一次范围校验，坏数据
+                // 不至于把地图链接指到无意义的坐标。
+                const num = (v) =>
+                    v === null || v === undefined || v === '' ? NaN : Number(v);
+                const latN = num(lat);
+                const lonN = num(lon);
+                const altN = num(alt);
+                const hasLoc =
+                    Number.isFinite(latN) &&
+                    Number.isFinite(lonN) &&
+                    !(latN === 0 && lonN === 0) &&
+                    Math.abs(latN) <= 90 &&
+                    Math.abs(lonN) <= 180;
                 const locationSection = locationBody.parentElement;
 
                 if (!hasLoc) {
@@ -1240,8 +1259,11 @@
                 const rows = [
                     { key: '纬度', value: formatLat(latN) },
                     { key: '经度', value: formatLon(lonN) },
-                    { key: '海拔', value: Number.isFinite(Number(alt)) ? formatAlt(alt) : '' },
                 ];
+                // 海拔单独判断：同样不能让 Number(null) 的 0 冒充「海平面」。
+                if (Number.isFinite(altN)) {
+                    rows.push({ key: '海拔', value: formatAlt(altN) });
+                }
                 renderKeyValue(locationKv, rows);
 
                 const href = `https://www.google.com/maps?q=${latN},${lonN}&z=15`;
