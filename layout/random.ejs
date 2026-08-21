@@ -92,9 +92,23 @@ ORDER BY random() LIMIT 1;`
             nextImage();           
             const widget = getParam("widget");
             const daily = getParam("daily");
+            // widget=true 是给嵌入用的（iframe / 小挂件）。这种场景里页面外框的
+            // 留白全是多余的：.content-area 的 margin-top: 80px 本是给固定导航条
+            // 让位，而嵌入时根本不该有导航条占位；相框自己那份上下 padding 同理。
+            // 原来这里反而又加了 60/70px，照片上下留出大片死白。一律归零，让照片
+            // 尽量铺满可用空间。
             if (widget !== null && widget === "true") {
-                var node = $('#all-pic');
-                node.attr('style', 'padding-top: 60px; padding-bottom:70px')
+                document.documentElement.classList.add('is-widget');
+                // 相框衬底改成白的。#imgbox 是 object-fit: contain，竖构图时左右
+                // （横构图时上下）会露出后面的 .pic-item——站内它是黑的，看照片时
+                // 黑衬底最不干扰；但嵌到小组件里四周是白的，这块黑就成了突兀的色块。
+                //
+                // 这里用内联 !important 而不是 CSS 规则：single-photo.ejs 里那个
+                // <div id="pic-g" class="pic-item" /> 是自闭合写法，HTML 不认，
+                // 解析出来的 DOM 结构跟源码不一致，页面内 <style> 甚至没进
+                // document.styleSheets，普通 CSS 规则压不住它。内联最高优先级最稳。
+                var mat = document.getElementById('pic-g');
+                if (mat) mat.style.setProperty('background-color', '#fff', 'important');
             }
             download.click(function () {
                 // daily 模式下固定文件名，保持原行为
