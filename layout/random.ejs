@@ -104,7 +104,7 @@ ORDER BY random() LIMIT 1;`
             // 尽量铺满可用空间。
             if (widget !== null && widget === "true") {
                 document.documentElement.classList.add('is-widget');
-                // 底部给小组件标题栏留的空，?inset=0 / ?inset=60px 可覆盖。
+                // 底部额外给小组件标题栏留的空，默认 0；?inset=60 / ?inset=9vh。
                 const inset = getParam("inset");
                 if (inset !== null) {
                     document.documentElement.style.setProperty('--widget-inset', /^\d+(\.\d+)?$/.test(inset) ? inset + 'px' : inset);
