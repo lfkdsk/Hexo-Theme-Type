@@ -92,7 +92,8 @@
        正好被小组件自己的标题栏（"GALLERY · x min ago"）盖住，成了半截。
        所以嵌入模式下：按钮整排藏掉；页面钉死成一屏高，照片吃掉 EXIF 以外的
        全部空间（cover 裁切，不留衬底）；底部留出 --widget-inset 给标题栏，
-       默认 10vh，可以用 ?inset=0 之类的参数改。 */
+       默认 10vh，可以用 ?inset=0 之类的参数改。上、左、右再留一圈 4vmin 的白边，
+       不然照片的四个角会被小组件的圆角裁掉，EXIF 文字也会贴着边。 */
     .is-widget #tools-wrapper {
         display: none !important;
     }
@@ -101,7 +102,7 @@
         height: 100vh;
         max-height: none !important;
         max-width: none !important;
-        padding: 0 0 var(--widget-inset, 10vh) 0 !important;
+        padding: 4vmin 4vmin var(--widget-inset, 10vh) 4vmin !important;
         box-sizing: border-box;
     }
 
