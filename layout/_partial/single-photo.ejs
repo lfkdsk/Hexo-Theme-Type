@@ -87,6 +87,47 @@
         background-color: #fff !important;
     }
 
+    /* 桌面小组件（Glimpse 之类）只是给网页拍个快照：页面多高都只截第一屏，
+       按钮也点不了。原来照片 + EXIF 就已经占满一屏，三个按钮被挤到最底下，
+       正好被小组件自己的标题栏（"GALLERY · x min ago"）盖住，成了半截。
+       所以嵌入模式下：按钮整排藏掉；页面钉死成一屏高，照片吃掉 EXIF 以外的
+       全部空间（cover 裁切，不留衬底）；底部留出 --widget-inset 给标题栏，
+       默认 10vh，可以用 ?inset=0 之类的参数改。 */
+    .is-widget #tools-wrapper {
+        display: none !important;
+    }
+
+    .is-widget .content-area {
+        height: 100vh;
+        max-height: none !important;
+        max-width: none !important;
+        padding: 0 0 var(--widget-inset, 10vh) 0 !important;
+        box-sizing: border-box;
+    }
+
+    .is-widget .content-area > .grid {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .is-widget #all-pic {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .is-widget #pic-g {
+        flex: 1;
+        min-height: 0;
+        aspect-ratio: auto;
+    }
+
+    .is-widget #imgbox {
+        object-fit: cover;
+    }
+
     .is-widget .itp-float-bar,
     .is-widget .itp-footer,
     .is-widget .itp-nav-sheet,

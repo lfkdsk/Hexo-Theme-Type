@@ -104,6 +104,11 @@ ORDER BY random() LIMIT 1;`
             // 尽量铺满可用空间。
             if (widget !== null && widget === "true") {
                 document.documentElement.classList.add('is-widget');
+                // 底部给小组件标题栏留的空，?inset=0 / ?inset=60px 可覆盖。
+                const inset = getParam("inset");
+                if (inset !== null) {
+                    document.documentElement.style.setProperty('--widget-inset', /^\d+(\.\d+)?$/.test(inset) ? inset + 'px' : inset);
+                }
                 // 相框衬底改成白的。#imgbox 是 object-fit: contain，竖构图时左右
                 // （横构图时上下）会露出后面的 .pic-item——站内它是黑的，看照片时
                 // 黑衬底最不干扰；但嵌到小组件里四周是白的，这块黑就成了突兀的色块。
