@@ -14,21 +14,72 @@
     <div id="map"></div>
   </div>
 
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  <script src="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
   <script>
     $(function () {
       $("div.lazy").lazyload();
     });
   </script>
   <style>
+    /* 原来写死 #fff，和 /status 之前一个毛病：把主题的暗色底盖掉。 */
     body {
-      background-color: #fff;
+      background-color: var(--surface-2, #fff);
+    }
+
+    /* 原来是 70vh × 70vw：1440×900 下只有 1008×630，标题又把它往下压 283px，
+       页面总高 1219，要滚动才看得到地图底部。地图是这一页的主体，给足空间。 */
+    /* Leaflet 容器默认底色是 #ddd，瓦片盖不住的地方就露出它。结构性的空缺由
+       minZoom / maxBounds 挡掉了（见脚本里的 clampZoom），这里剩下的是瓦片
+       加载途中的一瞬——暗色处理只作用在 .leaflet-layer 上，容器背景不在其中，
+       所以那一瞬在深色页面上会闪一下浅灰。让它跟页面底色一致。 */
+    .leaflet-container {
+      background: var(--surface-2, #ddd);
+    }
+
+    /* 聚合气泡：照片蓝、相册绿，和地图上蓝针/绿针的分类一致。
+       两类分开着色，才看得出某一片是「有个相册」还是「几张散图」。 */
+    .gmap-cluster {
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .gmap-cluster div {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      color: #fff;
+      font-weight: 700;
+      font-size: 12px;
+      line-height: 1;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, .55), 0 2px 8px rgba(0, 0, 0, .28);
+    }
+
+    .gmap-cluster-sm div { width: 30px; height: 30px; font-size: 11px; }
+    .gmap-cluster-md div { width: 38px; height: 38px; }
+    .gmap-cluster-lg div { width: 46px; height: 46px; font-size: 13px; }
+
+    /* 蓝 = 单张照片，和 Leaflet 默认针一个色系 */
+    .gmap-cluster-photo div { background: #2b82cb; }
+    /* 绿 = 相册，和绿针一致；相册是这一页的主角，给它一圈更明显的光晕 */
+    .gmap-cluster-album div {
+      background: #2aad27;
+      box-shadow: 0 0 0 3px rgba(42, 173, 39, .35), 0 0 0 1px rgba(255, 255, 255, .6), 0 2px 8px rgba(0, 0, 0, .28);
     }
 
     #map {
-      height: 70vh;
-      width: 70vw;
+      height: min(78vh, 900px);
+      width: min(1500px, 94vw);
       min-width: 600px;
       margin: 0 auto;
+      border-radius: var(--radius-lg, 16px);
     }
 
     .gmarker {
@@ -56,6 +107,28 @@
       .leaflet-control-zoom-out,
       .leaflet-control-attribution {
         filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+      }
+
+      /* 弹窗不能走上面那条 invert——它里面是照片，反相就毁了。显式给深色。
+         之前没管它，于是深色地图上浮着一块纯白卡片。 */
+      .leaflet-popup-content-wrapper,
+      .leaflet-popup-tip {
+        background: var(--surface-1, #1c1d20);
+        color: var(--text-strong, #f3f4f6);
+        box-shadow: 0 4px 18px rgba(0, 0, 0, .5);
+      }
+
+      .leaflet-popup-content a {
+        color: var(--main-color, #6aa9ff);
+      }
+
+      .leaflet-popup-close-button {
+        color: var(--text-muted, #9aa0a6) !important;
+      }
+
+      /* 聚合气泡的描边跟着深色底走（配色本身在 .gmap-cluster 里，明暗通用）。 */
+      .gmap-cluster div {
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, .14), 0 2px 8px rgba(0, 0, 0, .5);
       }
     }
 
@@ -152,11 +225,68 @@
     var single_data = JSON.parse(`<%- JSON.stringify(site.data.location) %>`);
 
     var slogan = $("#slogan")[0];
-    var map = L.map('map');
+    var map = L.map('map', {
+      // 纵向不允许缩到「世界比容器还矮」：Web Mercator 在 zoom z 的世界高度是
+      // 256 * 2^z 像素，比容器矮就必然在上下露出底板（而且纬度 85° 以外本来就
+      // 没有瓦片，那块永远补不上）。minZoom 由容器高度反推，见下面 clampZoom。
+      worldCopyJump: true,
+    });
+
+    // 容器高度决定「刚好铺满」的最小 zoom。窗口尺寸会变，所以 resize 时重算。
+    function clampZoom() {
+      var h = map.getSize().y;
+      var min = Math.ceil(Math.log(h / 256) / Math.LN2);
+      map.setMinZoom(Math.max(0, min));
+    }
+    map.on('resize', clampZoom);
+
+    // 纵向不让拖出有瓦片的范围（±85.05° 是 Web Mercator 的边界）；
+    // 经度不限制，横向本来就是无限循环的。
+    map.setMaxBounds([[-85.05, -Infinity], [85.05, Infinity]]);
+    map.options.maxBoundsViscosity = 1.0;
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
+    // 992 个点原来是逐个 addTo(map)：密集的地方针完全叠在一起，看不出有几张，
+    // DOM 也堆到三千多个节点。收进聚合层，缩放时自动合并/展开。
+    // 分两个聚合层：照片（蓝，911 个）和相册（绿，81 个）。合成一层的话，
+    // 聚合气泡会把两类混在一起，就看不出「这里有个相册」还是「这里有几张散图」了
+    // ——而蓝针/绿针本来就是这一页仅有的分类信号。
+    function makeCluster(kind) {
+      return L.markerClusterGroup({
+        showCoverageOnHover: false,
+        spiderfyOnMaxZoom: true,
+        maxClusterRadius: 45,
+        iconCreateFunction: function (c) {
+          var n = c.getChildCount();
+          var size = n < 10 ? 'sm' : (n < 100 ? 'md' : 'lg');
+          // 相册和照片天然落在同一批坐标上（相册的点就在它自己照片附近），
+          // 两个都以坐标为中心的话会叠成一坨、数字互相盖住。让相册那层以底边
+          // 对齐坐标——像针一样"站"在点上，照片圆圈仍居中，两者就错开了。
+          return L.divIcon({
+            html: '<div><span>' + n + '</span></div>',
+            className: 'gmap-cluster gmap-cluster-' + kind + ' gmap-cluster-' + size,
+            iconSize: L.point(40, 40),
+            iconAnchor: kind === 'album' ? L.point(20, 48) : L.point(20, 20),
+          });
+        },
+      });
+    }
+    var cluster = makeCluster('photo');
+    var albumCluster = makeCluster('album');
+    // 每个相册都 new 一个同样的 Icon 没必要，提到循环外。
+    // 图标原来取自 raw.githubusercontent.com——那个域名在大陆是被墙的，
+    // 相册 marker 会整片裂图。换成 jsDelivr 的同一个仓库。
+    var albumIcon = new L.Icon({
+      iconUrl: 'https://cdn.jsdelivr.net/gh/lfkdsk/leaflet-color-markers@master/img/marker-icon-2x-green.png',
+      shadowUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/images/marker-shadow.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41]
+    });
+    var bounds = [];
     var first = null;
     var firstMark = null;
     var keys = Object.keys(single_data)
@@ -172,7 +302,9 @@
       var cover = '<%- config.thumbnail_url %>' + file.substr(0, file.lastIndexOf(".")) + ".webp"
       if (v.hasOwnProperty('location') && v.location.length !== 0) {
         // add marker
-        var marker = L.marker(v.location).addTo(map);
+        var marker = L.marker(v.location);
+        cluster.addLayer(marker);
+        bounds.push(v.location);
         marker.bindPopup(`<a href="<%- full_url_for() %>${v.dir}?name=${v.name}">LINK</a>` + `<img class="gmarker nofancy" src=${cover} style="margin-top:4px;" />`);
       }
     }
@@ -194,27 +326,34 @@
         if (first === null) {
           first = v.location;
         }
-        var icon = new L.Icon({
-          iconUrl: 'https://raw.githubusercontent.com/lfkdsk/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-          iconSize: [25, 41],
-          iconAnchor: [12, 41],
-          popupAnchor: [1, -34],
-          shadowSize: [41, 41]
-        });
         // add marker
-        var marker = L.marker(v.location, {icon: icon}).addTo(map);
+        var marker = L.marker(v.location, { icon: albumIcon, zIndexOffset: 1000 });
+        albumCluster.addLayer(marker);
+        bounds.push(v.location);
         marker.bindPopup(`<a href="<%- full_url_for() %>${v.url}">${key}</a>` + `<img class="gmarker nofancy" src=${cover} style="margin-top:4px;" />`);
         if (firstMark === null) {
           firstMark = marker;
         }
       }
     }
-    if (first === null) {
-      first = [35.026051014758096, 135.76269658252528]
+    map.addLayer(cluster);
+    map.addLayer(albumCluster); // 后加的画在上面，相册不会被照片盖住
+    clampZoom();
+
+    // 原来是 setView(第一个 marker, 12) 并自动弹窗：标题写着「Travel all over
+    // the world」，进来却是某一个湖的特写。fitBounds 到所有点才对得上这句话；
+    // 想看某一张，点进去就是了，不必替访客先选好。
+    if (bounds.length > 0) {
+      map.fitBounds(bounds, { padding: [40, 40], maxZoom: 12 });
+    } else if (first !== null) {
+      map.setView(first, 12);
+    } else {
+      map.setView([35.026051014758096, 135.76269658252528], 12);
     }
-    map.setView(first, 12);
-    if (firstMark !== null) {
+
+    // 带 ?album= 进来是「只看这一个相册」，这时候只有少量点，直接把弹窗打开还是
+    // 有用的；全量视图下就别自动弹了。
+    if (album !== "" && album !== null && firstMark !== null) {
       firstMark.openPopup();
     }
   </script>
